@@ -838,3 +838,119 @@ pyinstaller>=6.0
 - [ ] Автотесты зелёные на Linux и Windows.
 - [ ] GitHub Actions собирает `GostGenerator.exe`, который работает на чистой Windows без Python.
 - [ ] Выданы все файлы целиком, `README`/`DECISIONS`/`CHANGELOG` заполнены, заглушек нет.
+
+---
+
+## 19. CLI для ИИ-агентов (обязательно в v1)
+
+### 19.1 Один источник истины
+GUI и CLI — оболочки над `app/core`. Дублирование логики запрещено: инспектор, нормализатор,
+раннер и хранилища правил одни и те же. `app/cli.py` **не импортирует** `app/ui` и `customtkinter`
+(проверяется тестом), работает headless.
+
+### 19.2 Точка входа
+- Разработка: `python -m app.cli <command> ...`
+- Сборка: в `build.spec` **два EXE из одного кода**:
+  `GostGenerator.exe` (`console=False`, GUI) и `gost.exe` (`console=True`, CLI).
+  Причина: `--windowed` exe не имеет консоли, агент не увидит stdout.
+- Опционально `console_scripts` в packaging: `gost = app.cli:main`.
+
+### 19.3 Команды
+```text
+gost init [--agents] [--dir PATH]
+gost doctor [--json]
+gost rules list|show|validate|export|import|diff
+gost profile list|show|set|use|export|import
+gost scripts list|describe|add|validate
+gost run SCRIPT [--input P] [--output P] [--params JSON|@file]
+                [--rules NAME|PATH] [--profile NAME] [--normalize|--no-normalize]
+                [--check] [--fail-on error|warning|never] [--dry-run] [--json]
+gost check PATH... [--rules ...] [--strict|--no-strict]
+                   [--format json|text|md] [--report P] [--fail-on ...] [--json]
+gost fix PATH... [--rules ...] [--dry-run] [--backup|--no-backup] [--json]
+gost batch DIR [--glob *.docx] [--check] [--fix] [--report P] [--json]
+gost job run task.json [--json]
+gost schema rules|profile|script-meta|report|job
+gost explain CODE
+gost context [--json]
+```
+
+### 19.4 Контракт вывода (критично)
+- **stdout — только результат** (JSON при `--json`, иначе текст/md). **stderr — логи и прогресс.**
+  Смешивать запрещено.
+- Единый конверт JSON для всех команд:
+```json
+{
+  "schema_version": 1,
+  "ok": false,
+  "command": "check",
+  "data": {},
+  "errors": [{"code": "FILE_NOT_FOUND", "message": "...", "path": "..."}],
+  "warnings": []
+}
+```
+- `gost check` в `data`: `file`, `preset`, `strict`, `summary{error,warning,info}`,
+  `issues[{code,severity,message,location{paragraph,snippet},hint}]`.
+- Никакого интерактива: ни `input()`, ни подтверждений. Флаг `--yes` подразумевается.
+- `--dry-run` для `run` и `fix`: план действий без записи файлов.
+- `fix` идемпотентен: повторный запуск не меняет файл (тест обязателен).
+
+### 19.5 Коды возврата
+| Код | Значение |
+|---|---|
+| 0 | успех, нарушений нет |
+| 1 | найдены нарушения (`check`, `run --check`) |
+| 2 | ошибка аргументов/использования |
+| 3 | файл или каталог не найден |
+| 4 | скрипт-плагин завершился с ошибкой |
+| 5 | таймаут |
+| 6 | невалидный конфиг/пресет/профиль |
+| 7 | нормализация не удалась |
+
+### 19.6 Приоритет настроек
+`флаги > переменные окружения (GOST_RULES, GOST_PROFILE, GOST_HOME, GOST_OUTPUT) >
+gost.json в текущем проекте > пользовательский конфиг > встроенные дефолты`.
+
+### 19.7 Декларативная задача
+```json
+{
+  "schema_version": 1,
+  "script": "make_karta.py",
+  "params": {"theme": "Моя семья", "age_group": "3-4", "duration_min": 15},
+  "rules": "pedagogical",
+  "profile": "default",
+  "output": "output/karta.docx",
+  "post": {"normalize": true, "check": true, "fail_on": "error"}
+}
+```
+`gost job run task.json --json` выполняет генерацию, нормализацию и проверку как одну операцию.
+
+---
+
+## 20. Самодокументирование для агентов
+
+Обязательные артефакты, генерируемые `gost init --agents`:
+
+1. **`AGENTS.md`** в корне проекта — что за проект, рецепты команд, коды возврата,
+   правило «stdout=JSON», запрет ручной правки OOXML в обход `gost fix`, список пресетов.
+2. **`schemas/*.json`** — JSON Schema для `rules`, `profile`, `script-meta`, `report`, `job`.
+   Отдаются командой `gost schema <name>`; используются тестами для валидации вывода.
+3. **`gost context --json`** — активный пресет со всеми значениями, список скриптов с
+   `SCRIPT_META`, профили, каталоги, версии, доступность интерпретатора. Первый вызов агента.
+4. **`gost explain CODE`** — расшифровка кода нарушения + способ исправления + пункт методички.
+5. **`examples/`** — по одному рабочему примеру на команду и один `task.json`.
+
+### 20.1 Правки существующих разделов
+- §4: добавить `app/cli.py`, `app/core/job.py`, `schemas/`, `examples/`, `AGENTS.md`, `tests/test_cli.py`.
+- §12: добавить «CLI не импортирует GUI; работает без дисплея».
+- §14: два EXE в `build.spec`; CI-шаг smoke-теста CLI (`gost doctor`, `gost check` на фикстуре,
+  проверка кода возврата и валидности JSON по схеме).
+- §15: `test_cli.py` — коды возврата, разделение stdout/stderr, валидность JSON по схемам,
+  идемпотентность `fix`, отсутствие импорта GUI.
+- §16: новый этап **M8 — CLI + AGENTS.md + schemas + examples**.
+- §18 (DoD): добавить «агент проходит сценарий `init → context → run → check → fix → check`
+  без участия человека, читая только `AGENTS.md`».
+
+### 20.2 Задел на будущее
+`gost mcp serve` (MCP-сервер поверх того же ядра) — в v1 не реализовывать,
+архитектура «ядро отдельно от оболочек» это позволяет без переписывания.
