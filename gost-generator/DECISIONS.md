@@ -254,3 +254,14 @@ windows-специфичные проблемы:
   cp866 показал бы кириллицу «кракозябрами».
 - сравнение путей скрипта в `test_runner_internal_dev_mode` — через `os.path.normcase`: temp-каталог
   GitHub-раннера приходит 8.3-именем (`RUNNER~1`), и `resolve()` не совпадает с исходным написанием.
+
+## D46. PyInstaller: ядро нужно объявить в hiddenimports
+Smoke-шаг `build-windows.yml` (`gost.exe check … --fail-on error`) упал с
+`CORE_NOT_AVAILABLE: Модуль app.core.docx_inspector недоступен`, хотя `gost.exe doctor --json`
+работал: в собранном exe не импортировалось ни одно `app.core.*`. Причина — единственная точка
+динамического импорта `importlib.import_module("app.core." + name)` в `cli_core.core_module()`;
+PyInstaller строит граф по статическим `import` и модулей за этой строкой в архив не кладёт.
+Лечим в `build.spec`: `hiddenimports` дополняется списком `CORE_MODULES` из того же `cli_core`
+(новый модуль ядра попадает в сборку автоматически, отдельной правки spec не требуется).
+Проверка именно в CI, а не юнит-тестом: в исходниках импорт проходит и на Linux, и на Windows,
+поломка существует только внутри onefile-архива.

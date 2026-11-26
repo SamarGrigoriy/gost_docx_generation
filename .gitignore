@@ -9,6 +9,9 @@ venv/
 # Артефакты сборки PyInstaller
 build/
 dist/
+# Локальная проверка spec-файла под своей ОС (`--distpath dist_local --workpath build_local`)
+build_local/
+dist_local/
 
 # Данные приложения и результаты прогонов (не исходники)
 gost-generator/output/

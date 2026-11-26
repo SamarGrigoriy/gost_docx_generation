@@ -38,6 +38,17 @@ exe собирается **только под Windows** (ограничение
 Локально на Windows: `pyinstaller build.spec --noconfirm`.
 На Linux/Wine цель `make build-win-local` — только для экспериментов.
 
+Сам `build.spec` можно проверить под своей ОС, не собирая exe: PyInstaller строит архив по
+статическому графу импортов, а ядро подключается динамически, поэтому модули `app.core.*`
+обязаны быть в `hiddenimports` (берутся из `cli_core.CORE_MODULES`). Проверка на Linux:
+
+```bash
+venv/bin/python -m PyInstaller build.spec --noconfirm \
+    --distpath dist_local --workpath build_local
+./dist_local/gost doctor --json | grep -A1 core.docx_inspector   # должен быть "ok"
+./dist_local/gost check tests/fixtures/fixtures_good.docx --format json --fail-on error
+```
+
 Workflow лежат в корне репозитория (`.github/workflows/`), потому что GitHub не видит
 `.github` во вложенных папках: `ci.yml` — тесты на Linux и Windows при каждом push,
 `build-windows.yml` — сборка и smoke-проверка exe.

@@ -5,6 +5,11 @@ from PyInstaller.utils.hooks import copy_metadata, collect_data_files, collect_s
 
 import customtkinter
 
+# Ядро подключается к CLI динамически (`importlib.import_module("app.core." + name)` в
+# app/cli_core.py), поэтому граф статических импортов PyInstaller его не видит и в onefile
+# архив кладёт только app.cli_core: `gost.exe check` падал с CORE_NOT_AVAILABLE.
+from app.cli_core import CORE_MODULES  # noqa: E402
+
 datas = [
     ("assets", "assets"),
     ("presets", "presets"),
@@ -22,7 +27,7 @@ datas += copy_metadata("customtkinter")
 hiddenimports = [
     "customtkinter",
     "PIL._tkinter_finder",
-] + collect_submodules("customtkinter")
+] + [f"app.core.{name}" for name in CORE_MODULES] + collect_submodules("customtkinter")
 
 common = dict(
     pathex=["."],

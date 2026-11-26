@@ -56,6 +56,10 @@
   сборка exe остаётся на тегах `v*` и `workflow_dispatch`.
 - `packaging/`: лаунчер, `.desktop` и установщик пункта меню «ГОСТ-Генератор» в Linux без sudo
   (`make desktop`) — регистрация в `~/.local/share/applications`, иконка в hicolor.
+- Собранное `gost.exe` не находило ядро (`CORE_NOT_AVAILABLE` у `check`): `build.spec` теперь
+  добирает `app.core.*` в `hiddenimports` из `CORE_MODULES`, потому что ядро подключается
+  динамическим `importlib.import_module` и остаётся вне графа статических импортов PyInstaller
+  (DECISIONS D46). Поймал smoke-шаг `build-windows.yml`, а не юнит-тесты.
 - UTF-8 для stdout/stderr во всех точках входа и `PYTHONIOENCODING=utf-8` дочерним плагинам:
   на Windows-консоли (cp866/cp1251) кириллица в имени документа роняла CLI и генератор фикстур
   с `UnicodeEncodeError` — это поймал первый же CI-прогон на `windows-latest`.
