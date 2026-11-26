@@ -55,8 +55,8 @@ def _figure_captions(ctx: CheckContext) -> list[tuple[ParagraphInfo, re.Match[st
         return []
     out: list[tuple[ParagraphInfo, re.Match[str]]] = []
     for para in ctx.model.paragraphs:
-        if para.in_table:
-            continue
+        if para.in_table or para.is_toc:
+            continue  # строка содержания («Рисунок 1……5») — не подпись
         match = rx.match(" ".join(para.text.split()).strip())
         if match:
             out.append((para, match))
@@ -205,8 +205,8 @@ def _table_captions(ctx: CheckContext) -> list[tuple[ParagraphInfo, re.Match[str
         return []
     out: list[tuple[ParagraphInfo, re.Match[str]]] = []
     for para in ctx.model.paragraphs:
-        if para.in_table:
-            continue
+        if para.in_table or para.is_toc:
+            continue  # строка содержания («Рисунок 1……5») — не подпись
         match = rx.match(" ".join(para.text.split()).strip())
         if match:
             out.append((para, match))
@@ -340,6 +340,21 @@ def _bold_ratio_of(ctx: CheckContext, indexes: Iterable[int]) -> float:
     return (bold / total) if total else 0.0
 
 
+def _cell_border_sides(table: dp.TableInfo) -> set[str]:
+    """Стороны границ, объявленные по ячейкам (`w:tcBorders`).
+
+    Так сохраняет LibreOffice, разворачивая границы таблицы по клеткам: `w:tblBorders`
+    исчезает, а сетка на месте — считать такую таблицу без границ нельзя.
+    """
+    sides: set[str] = set()
+    for tc in table.element.iter(dx.qn("w:tcBorders")):
+        for el in tc:
+            if (el.get(dx.qn("w:val")) or "none").strip().lower() in dp.OFF_VALUES:
+                continue
+            sides.add(el.tag.rsplit("}", 1)[-1])
+    return sides
+
+
 def _check_table_borders(ctx: CheckContext, tables: Mapping[str, Any],
                          table: dp.TableInfo) -> None:
     """TBL_BORDERS: тонкие сплошные границы (tblBorders, sz в 1/8 пункта)."""
@@ -351,6 +366,8 @@ def _check_table_borders(ctx: CheckContext, tables: Mapping[str, Any],
     borders = dx.find_child(tbl_pr, "w:tblBorders") if tbl_pr is not None else None
     needed = ("top", "left", "bottom", "right", "insideH", "insideV")
     if borders is None:
+        if {"top", "bottom", "left", "right"} <= _cell_border_sides(table):
+            return  # сетка задана по ячейкам — границы есть, толщина не проверяется
         ctx.add("TBL_BORDERS",
                 "У таблицы нет явных границ (w:tblBorders): границы могут быть не заданы или "
                 "взяться из стиля.",

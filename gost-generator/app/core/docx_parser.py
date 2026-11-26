@@ -41,6 +41,11 @@ JC_ALIASES: dict[str, str] = {
     "distribute": "distribute",
 }
 
+# Стили строк автосодержания: Word — TOC1…TOC9, LibreOffice — Contents1…, русская локаль —
+# «Оглавление 1…». Сравнивается с началом id, цифры и пробелы допустимы.
+TOC_STYLE_RE = re.compile(r"^(toc|contents|table ?of ?contents|оглавлен(?:ие|ие))[\s_-]?\d*$",
+                          re.IGNORECASE)
+
 OFF_VALUES = ("0", "false", "none", "no")
 
 
@@ -124,6 +129,20 @@ class ParagraphInfo:
     has_page_break_run: bool = False
     has_sect_break: bool = False
     is_empty: bool = True
+
+    @property
+    def is_toc(self) -> bool:
+        """Строка автосодержания, а не заголовок раздела.
+
+        Слово в содержании — это обычный текст с номером страницы справа: стили `TOC1`…`TOC9`
+        («Оглавление 1», «Contents 2» у LibreOffice) или поле `PAGEREF`. Такие абзацы короче
+        и «похожи на заголовок» только из-за номера в начале, и проверки заголовков по ним
+        дают ложные нарушения.
+        """
+        style = (self.props.style or self.eff.style or "")
+        instr = self.instr.upper()
+        return bool(TOC_STYLE_RE.match(style.strip())) or "PAGEREF" in instr \
+            or re.search(r"\bTOC\b|\bОГЛАВЛ\b", instr) is not None
 
     @property
     def has_drawing(self) -> bool:
@@ -315,9 +334,19 @@ class StyleRegistry:
         merged: dict[str, Any] = dict(self.defaults_para)
         for st in self._chain(style_id):
             merged.update({k: v for k, v in st["para"].items() if k != "style"})
+        direct: dict[str, Any] = {}
         for ov in overlays:
             merged.update({k: v for k, v in ov.items() if k != "style"})
+            direct.update(ov)
         merged["style"] = style_id
+        # w:firstLine и w:hanging — одна группа отступа: прямое `w:hanging="0"` снимает
+        # унаследованный из стиля firstLine (Word и LibreOffice рисуют абзац без красной
+        # строки). Без этого подписи таблиц и рисунков, где стояло hanging, читаются как
+        # набранные с отступом 709 и проверка выдаёт ложные FIG_CAPTION/TBL_CAPTION.
+        if "hanging" in direct and "first_line" not in direct:
+            merged["first_line"] = 0
+        elif "first_line" in direct and "hanging" not in direct:
+            merged.pop("hanging", None)
         return merged
 
 
@@ -941,8 +970,8 @@ def heading_level(text: str, para: ParagraphInfo) -> int | None:
 
 def looks_like_heading(para: ParagraphInfo, rules: Mapping[str, Any] | None = None) -> bool:
     """Заголовок раздела/подраздела: стиль, номер в начале или короткий жирный без точки."""
-    if para.in_table or para.is_empty or para.instr:
-        return False  # абзац с полем (TOC/PAGE) — не заголовок, даже если начинается с цифры
+    if para.in_table or para.is_empty or para.instr or para.is_toc:
+        return False  # абзац с полем (TOC/PAGE) или строка содержания — не заголовок
     text = para.text.strip()
     if len(text) > 160 or para.is_code:
         return False
@@ -985,7 +1014,8 @@ def main_paragraphs(model: DocxModel, rules: Mapping[str, Any],
     Исключаются также:
     * титульный лист (всё, что до первого структурного элемента) — он форматируется
       по шаблону вуза, а не как текст работы;
-    * абзацы с полями (TOC/PAGE): «1 Раздел……5» из содержания перебило бы статистику.
+    * абзацы с полями (TOC/PAGE) и строки содержания (стили TOC*/Contents*): «1 Раздел……5»
+      из содержания перебило бы статистику.
 
     Именно по этому множеству считаются шрифт/кегль/интервал/отступ — иначе 12-pt
     таблицы и Consolas перебивают статистику (дефекты №1–2 старого чекера, п. 11.2 ТЗ).
@@ -999,8 +1029,8 @@ def main_paragraphs(model: DocxModel, rules: Mapping[str, Any],
             continue
         if structural_start is not None and para.index < structural_start:
             continue
-        if para.instr:
-            continue
+        if para.instr or para.is_toc:
+            continue  # строки автосодержания — не основной текст
         if is_caption(text, rx):
             continue
         if is_structural_heading(text, rules) or looks_like_heading(para, rules):

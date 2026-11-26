@@ -33,6 +33,20 @@ def codes(issues: list[Any], severity: str | None = None) -> set[str]:
     return {i.code for i in issues if i.severity != "info"}
 
 
+def _styles_xml(path: str) -> str:
+    """word/styles.xml из пакета: нужен, чтобы проверить наследуемый отступ в docDefaults."""
+    import zipfile
+    with zipfile.ZipFile(path) as zf:
+        return zf.read("word/styles.xml").decode("utf-8")
+
+
+def _document_xml(path: str) -> str:
+    """word/document.xml из пакета: убедиться, что фикстура действительно изменена."""
+    import zipfile
+    with zipfile.ZipFile(path) as zf:
+        return zf.read("word/document.xml").decode("utf-8")
+
+
 def issue_field(issue: Any, key: str) -> Any:
     """Замечание может быть dataclass (`check_docx`) или словарем (`check_docx_result`)."""
     return getattr(issue, key, None) if not isinstance(issue, dict) else issue.get(key)
@@ -163,6 +177,79 @@ class TestInspectorBrokenFile(unittest.TestCase):
             result = docx_inspector.check_docx_result(path, preset("gost_732"))
             manual = [i for i in result["issues"] if issue_field(i, "code") == "MANUAL"]
             self.assertTrue(manual, "блок «проверить вручную» обязателен (п. 9.1)")
+
+
+class TestWordRoundTrip(unittest.TestCase):
+    """Пересохранённый в Word/LibreOffice документ не должен давать ложных замечаний.
+
+    Живой файл пользователя (`РЦ.docx`) вскрыл три расхождения, каждое из которых
+    рождало нарушения там, где редактор рисует всё правильно: подпись с `w:hanging="0"`
+    вместо `w:firstLine="0"`, строки автосодержания в стилях TOC1/TOC2 и границы таблицы,
+    разложенные редактором по ячейкам.
+    """
+
+    def _patched(self, tmp: str, name: str, transform) -> str:
+        import zipfile
+        src = make_docx(Path(tmp) / f"{name}.docx")
+        out = Path(tmp) / f"{name}_patched.docx"
+        with zipfile.ZipFile(src) as zin, zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zout:
+            for item in zin.namelist():
+                data = zin.read(item)
+                if item == "word/document.xml":
+                    data = transform(data.decode("utf-8")).encode("utf-8")
+                zout.writestr(item, data)
+        return str(out)
+
+    def _codes(self, path: str) -> set[str]:
+        return codes(docx_inspector.check_docx(path, preset("gost_732")))
+
+    def test_hanging_indent_means_no_first_line(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = self._patched(tmp, "hanging",
+                                 lambda d: d.replace('<w:ind w:firstLine="0"', '<w:ind w:hanging="0"'))
+            xml = _document_xml(path)
+            self.assertIn('w:hanging="0"', xml, "фикстура должна использовать hanging")
+            self.assertIn('w:firstLine="709"', _styles_xml(path), "docDefaults должен давать отступ")
+            self.assertEqual(sorted(self._codes(path)), [],
+                             "hanging снимает унаследованный firstLine — отступа нет")
+
+    def test_toc_entries_are_not_headings(self) -> None:
+        toc = ('<w:p><w:pPr><w:pStyle w:val="TOC1"/></w:pPr>'
+               '<w:r><w:t>СОДЕРЖАНИЕ</w:t></w:r><w:r><w:tab/><w:t>2</w:t></w:r></w:p>'
+               '<w:p><w:pPr><w:pStyle w:val="TOC2"/></w:pPr>'
+               '<w:r><w:t>1.1 Анализ</w:t></w:r><w:r><w:tab/><w:t>3</w:t></w:r></w:p>')
+
+        def insert(d: str) -> str:
+            at = d.find('<w:pStyle w:val="Heading1"')
+            self.assertGreater(at, 0)
+            start = d.rfind("<w:p>", 0, at)
+            return d[:start] + toc + d[start:]
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = self._patched(tmp, "toc", insert)
+            issues = docx_inspector.check_docx(path, preset("gost_732"))
+            bad = [i.message for i in issues
+                   if i.code in {"HEAD_STRUCT", "HEAD_KEEP", "HEAD_SIZE", "TBL_CAPTION",
+                                 "FIG_CAPTION"} and "Анализ" in i.message]
+            self.assertEqual(bad, [], "строка содержания принята за заголовок")
+            self.assertEqual(sorted(self._codes(path)), [])
+
+    def test_cell_level_table_borders_are_borders(self) -> None:
+        sides = "".join(f'<w:{s} w:val="single" w:sz="4"/>'
+                        for s in ("top", "left", "bottom", "right"))
+
+        def to_cells(d: str) -> str:
+            import re as _re
+            d = _re.sub(r"<w:tblBorders>.*?</w:tblBorders>", "", d, flags=_re.S)
+            return d.replace("<w:tcPr>", f"<w:tcPr><w:tcBorders>{sides}</w:tcBorders>")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = self._patched(tmp, "cellborders", to_cells)
+            xml = _document_xml(path)
+            self.assertNotIn("w:tblBorders", xml)
+            self.assertIn("w:tcBorders", xml)
+            self.assertEqual(sorted(self._codes(path)), [],
+                             "границы по ячейкам — это границы, а не их отсутствие")
 
 
 if __name__ == "__main__":

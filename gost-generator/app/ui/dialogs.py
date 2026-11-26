@@ -469,17 +469,26 @@ def open_path(path: str | os.PathLike[str]) -> str | None:
                                 stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
                                 text=True, encoding="utf-8", errors="replace")
         try:
-            rc = proc.wait(timeout=OPEN_VERIFY_TIMEOUT_S)
-        except subprocess.TimeoutExpired:
-            return None
-        if rc == 0:
-            return None
-        why = ""
-        try:
-            why = (proc.stderr.read() if proc.stderr else "").strip()
-        except Exception:
-            why = ""
-        return t("open_failed", code=rc, why=why or t("open_failed_plain"))
+            try:
+                rc = proc.wait(timeout=OPEN_VERIFY_TIMEOUT_S)
+            except subprocess.TimeoutExpired:
+                return None  # процесс живёт сам: окно просмотрщика открывается
+            if rc == 0:
+                return None
+            try:
+                why = (proc.stderr.read() if proc.stderr else "").strip()
+            except Exception:
+                why = ""
+            return t("open_failed", code=rc, why=why or t("open_failed_plain"))
+        finally:
+            # Ручку конвейера надо закрыть обязательно: на Windows открытый fd блокирует
+            # удаление каталога, а в тесту ResourceWarning — виден как утечка.
+            for pipe in (proc.stdout, proc.stderr):
+                if pipe is not None:
+                    try:
+                        pipe.close()
+                    except OSError:
+                        pass
     except Exception as exc:  # нет ассоциаций/прав — понятное сообщение, не падение
         return str(exc)
 

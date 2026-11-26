@@ -535,8 +535,8 @@ def check_structural_headings(ctx: CheckContext) -> None:
     want_new_page = bool(headings.get("structural_new_page", True))
     want_no_dot = bool(headings.get("structural_no_trailing_dot", True))
     for para in ctx.model.paragraphs:
-        if para.in_table or not para.text.strip():
-            continue
+        if para.in_table or para.is_toc or not para.text.strip():
+            continue  # «СОДЕРЖАНИЕ 2» из автосодержания — не структурный элемент
         text = para.text.strip()
         if not dp.is_structural_heading(text, ctx.rules):
             continue
