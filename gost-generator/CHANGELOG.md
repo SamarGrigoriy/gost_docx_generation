@@ -44,6 +44,22 @@
 - `gost init --agents` выдаёт артефакты для агента: `AGENTS.md`, `schemas/*.json`,
   `examples/*.json`.
 
+- «Открыть папку скриптов/вывода» молчал, если каталога нет: запуск `xdg-open` считался успехом.
+  Теперь отсутствующий путь — ошибка в журнале (`open_missing`), а кнопка «Открыть каталог данных»
+  в настройках показывает её диалогом. Диалог выбора папки в «Настройках» получил заголовок своего
+  поля (раньше оба поля звались «Каталог вывода»).
+
+### Инфраструктура
+
+- Workflow перенесены в корень репозитория (GitHub не читает `.github` во вложенных папках) и
+  добавлен `ci.yml`: тесты на Linux 3.11/3.13/3.14 и Windows 3.11/3.13 при каждом push;
+  сборка exe остаётся на тегах `v*` и `workflow_dispatch`.
+- `packaging/`: лаунчер, `.desktop` и установщик пункта меню «ГОСТ-Генератор» в Linux без sudo
+  (`make desktop`) — регистрация в `~/.local/share/applications`, иконка в hicolor.
+- UTF-8 для stdout/stderr во всех точках входа и `PYTHONIOENCODING=utf-8` дочерним плагинам:
+  на Windows-консоли (cp866/cp1251) кириллица в имени документа роняла CLI и генератор фикстур
+  с `UnicodeEncodeError` — это поймал первый же CI-прогон на `windows-latest`.
+
 ### Скрипты-плагины (`scripts/`)
 
 - `mkdocx.py` (Markdown → DOCX по ГОСТ 7.32), `make_karta.py` (техкарта занятия),
@@ -123,7 +139,7 @@
 
 ## Автотесты
 
-`python -m unittest discover -s tests` — 169 тестов, все зелёные (прогон 2026-11-26, Debian 14,
+`python -m unittest discover -s tests` — 170 тестов, все зелёные (прогон 2026-11-26, Debian 14,
 Python 3.14, ~26 с). Модули: units, config, plugin_loader, runner,
 inspector, normalizer, rules_store, profile_store, report, cli (коды возврата, dry-run,
 приоритеты настроек), ui-smoke (реальное окно, пропускается без дисплея).

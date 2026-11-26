@@ -14,7 +14,7 @@
 |------|-----------|
 | `gost-generator/app/` | ядро (правила, инспектор, нормализатор, CLI) и GUI |
 | `gost-generator/scripts/` | скрипты-генераторы (плагины с `SCRIPT_META`) |
-| `gost-generator/tests/` | 169 автотестов (`unittest`) |
+| `gost-generator/tests/` | 170 автотестов (`unittest`) |
 | `gost-generator/schemas/`, `examples/` | контракты JSON для агента (ТЗ §19) |
 | `gost-generator/packaging/` | запуск из исходников и пункт меню для Linux |
 | `gost-generator/CHANGELOG.md`, `DECISIONS.md` | что сделано и почему решено так |

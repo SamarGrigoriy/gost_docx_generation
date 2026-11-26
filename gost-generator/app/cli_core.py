@@ -26,6 +26,16 @@ from app import constants
 # --- Ошибки CLI -------------------------------------------------------------
 
 
+def configure_console() -> None:
+    """UTF-8 для stdout/stderr: кириллица в консоли Windows (cp866/cp1251) иначе роняет
+    приложение `UnicodeEncodeError` до печати JSON-конверта (п. 19.4)."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):  # pragma: no cover - exotic streams
+            pass
+
+
 class CliError(Exception):
     """Ошибка с машинным кодом для конверта JSON (п. 19.4) и кода возврата (п. 19.5)."""
 

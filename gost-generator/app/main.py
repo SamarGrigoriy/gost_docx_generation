@@ -75,6 +75,8 @@ def _parse_internal_args(args: list[str]) -> tuple[int, list[str]]:
 
 def main(argv: list[str] | None = None) -> int:
     """Разобрать аргументы и выбрать режим; возвращает код для sys.exit."""
+    from app.cli_core import configure_console  # только stdlib, GUI не тянется
+    configure_console()
     args = list(sys.argv[1:] if argv is None else argv)
     pos, rest = _parse_internal_args(args)
     if pos >= 0:

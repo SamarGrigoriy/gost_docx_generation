@@ -199,6 +199,11 @@ def center_table_caption(path: str) -> None:
 
 
 def main() -> int:
+    # Имена фикстур кирилличные; консоль Windows (cp866/cp1251) их не печатает.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
     os.makedirs(HERE, exist_ok=True)
     with open(os.path.join(HERE, "пример.example.md"), "w", encoding="utf-8") as fh:
         fh.write(EXAMPLE_MD)

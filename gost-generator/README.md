@@ -38,6 +38,16 @@ exe собирается **только под Windows** (ограничение
 Локально на Windows: `pyinstaller build.spec --noconfirm`.
 На Linux/Wine цель `make build-win-local` — только для экспериментов.
 
+Workflow лежат в корне репозитория (`.github/workflows/`), потому что GitHub не видит
+`.github` во вложенных папках: `ci.yml` — тесты на Linux и Windows при каждом push,
+`build-windows.yml` — сборка и smoke-проверка exe.
+
+## Пункт меню в Linux
+
+`make desktop` (он же `sh packaging/install-linux-desktop.sh`) без прав суперпользователя
+регистрирует «ГОСТ-Генератор» в `~/.local/share/applications`, кладёт лаунчер
+`packaging/gost-generator` в `~/.local/bin` и иконку в `~/.local/share/icons/hicolor`.
+
 ## Как добавить свой скрипт-генератор
 
 Положите `.py` в каталог `scripts/` и объявите метаданные — приложение построит форму само:

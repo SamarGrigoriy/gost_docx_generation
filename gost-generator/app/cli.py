@@ -157,6 +157,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     """Точка входа CLI (п. 19.2). Возвращает код возврата из п. 19.5."""
+    cli_core.configure_console()
     parser = build_parser()
     args = parser.parse_args(argv)
     command = args.command

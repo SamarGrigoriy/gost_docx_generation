@@ -123,6 +123,9 @@ class ScriptRunner:
 
         creationflags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
         env = os.environ.copy()
+        # Дочерний скрипт должен печатать UTF-8: на русской Windows консоль по умолчанию
+        # cp866/cp1251, и кириллица в выводе падает с UnicodeEncodeError (читаем мы как UTF-8).
+        env["PYTHONIOENCODING"] = "utf-8"
         # Для `-m app.main` в режиме разработки: PYTHONPATH всегда видит корень репозитория.
         env["PYTHONPATH"] = (PROJECT_ROOT + os.pathsep + env["PYTHONPATH"]
                              if env.get("PYTHONPATH") else PROJECT_ROOT)

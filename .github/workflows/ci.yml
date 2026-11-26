@@ -27,7 +27,7 @@ jobs:
         working-directory: gost-generator
       - name: CLI smoke (JSON envelope, exit codes)
         run: |
-          python -m app.cli doctor --format json > doctor.json
+          python -m app.cli doctor --json > doctor.json
           python -c "import json;d=json.load(open('doctor.json',encoding='utf-8'));assert d['schema_version']==1 and d['ok'] is True"
           python -m app.cli check tests/fixtures/fixtures_good.docx --format json --fail-on error
         working-directory: gost-generator

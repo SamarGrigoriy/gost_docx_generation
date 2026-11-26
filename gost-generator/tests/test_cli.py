@@ -138,6 +138,17 @@ class TestCliBasics(unittest.TestCase):
         self.assertFalse(env["ok"])
         self.assertEqual(env["errors"][0]["code"], "FILE_NOT_FOUND")
 
+    def test_console_cp866_still_prints_cyrillic_paths(self) -> None:
+        """Регрессия Windows-сборки: консоль cp866 не должна ронять CLI на кириллице в пути."""
+        with tempfile.TemporaryDirectory() as td:
+            docx = Path(td) / "Отчёт 1.docx"
+            make_minimal_docx(docx)
+            proc = run_cli("check", str(docx), "--json", env={"PYTHONIOENCODING": "cp866"})
+        self.assertNotIn("UnicodeEncodeError", proc.stderr, proc.stderr[-400:])
+        self.assertIn(proc.returncode, (0, 1), proc.stderr)
+        env = parse_envelope(proc.stdout)
+        self.assertIn("Отчёт 1.docx", json.dumps(env, ensure_ascii=False))
+
     def test_unknown_command_exit2(self) -> None:
         """Неизвестная подкоманда → код 2 (п. 19.5)."""
         proc = run_cli("frobnicate")
