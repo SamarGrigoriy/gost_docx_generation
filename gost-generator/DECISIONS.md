@@ -237,3 +237,20 @@ encode characters` — консоль Windows (cp866/cp1251) не может н�
 `app/cli.py`, `app/main.py` и `tests/fixtures/make_fixtures.py`; дочерним плагинам раннер ставит
 `PYTHONIOENCODING=utf-8`, иначе их вывод мы декодируем как UTF-8 и получаем мусор. Регрессия:
 `test_console_cp866_still_prints_cyrillic_paths` гоняет CLI с `PYTHONIOENCODING=cp866`.
+
+## D45. Windows: UTF-8 должен быть согласован на обоих концах конвейера
+Второй Windows-прогон CI упал иначе: дочерние процессы CLI больше не падают, но 22 теста
+`test_cli`/`test_runner` получили `proc.stdout is None`. Причина — «Exception in thread
+_readerthread»: `subprocess.run(..., text=True)` без `encoding` декодирует поток в локальной
+кодовой странице родителя (cp1252), а ребёнок пишет UTF-8 (D44). Решение: все тестовые вызовы
+`subprocess` передают `encoding="utf-8", errors="replace"` — ровно как это делает раннер
+(`app/core/runner.py`), иначе UTF-8 ребёнка читается мусором. Попутно закрыты ещё две
+windows-специфичные проблемы:
+- `GostApp.destroy()` не закрывал сессионный `.log` (ручку держал только `_on_close`), из-за чего
+  на Windows удаление временного каталога давало `PermissionError [WinError 32]`. Закрытие вынесено
+  в `_close_session_log()` и вызывается из `destroy()` — ресурс освобождается вместе с окном.
+- `configure_console()` переключает консоль Windows в кодовую страницу 65001, но только для tty:
+  в pipe приёмнику нужен UTF-8 без управления кодовой страницей, а интерактивный `cmd.exe` на
+  cp866 показал бы кириллицу «кракозябрами».
+- сравнение путей скрипта в `test_runner_internal_dev_mode` — через `os.path.normcase`: temp-каталог
+  GitHub-раннера приходит 8.3-именем (`RUNNER~1`), и `resolve()` не совпадает с исходным написанием.

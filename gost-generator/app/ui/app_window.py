@@ -590,14 +590,26 @@ class GostApp(ctk.CTk):
         self.log.log(f"traceback: {text}", kind="stderr")
         dialogs.exception_dialog(self, str(val or exc), text)
 
+    def _close_session_log(self) -> None:
+        """Закрыть журнальный файл: на Windows открытая ручка блокирует удаление каталога."""
+        fh = getattr(self, "_session_fh", None)
+        if fh is None:
+            return
+        self._session_fh = None
+        self.log.set_session_sink(None)
+        try:
+            fh.flush()
+            fh.close()
+        except OSError:
+            pass
+
+    def destroy(self) -> None:
+        self._close_session_log()
+        super().destroy()
+
     def _on_close(self) -> None:
         self.save_state()
-        if self._session_fh is not None:
-            try:
-                self._session_fh.flush()
-                self._session_fh.close()
-            except OSError:
-                pass
+        self._close_session_log()
         self._rotate_logs()
         self.destroy()
 

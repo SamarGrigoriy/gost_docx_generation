@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -174,13 +175,15 @@ class InternalModeTests(ScriptFixtures):
         params.write_text(json.dumps({"argv": [], "cwd": None}), encoding="utf-8")
         proc = subprocess.run(
             [sys.executable, "-m", "app", "--internal-run", str(fail), str(params)],
-            cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=60)
+            cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=60,
+            encoding="utf-8", errors="replace")
         self.assertEqual(proc.returncode, 3, proc.stdout + proc.stderr)
 
         boom = self.write_script("raise.py", SCRIPT_RAISE)
         proc = subprocess.run(
             [sys.executable, "-m", "app", "--internal-run", str(boom), str(params)],
-            cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=60)
+            cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=60,
+            encoding="utf-8", errors="replace")
         self.assertEqual(proc.returncode, 1)
         self.assertIn("Traceback", proc.stdout)
 
@@ -193,7 +196,8 @@ class InternalModeTests(ScriptFixtures):
         params.write_text(json.dumps({"argv": [], "cwd": None}), encoding="utf-8")
         proc = subprocess.run(
             [sys.executable, "-m", "app.main", "--internal-run", str(probe), str(params)],
-            cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=60)
+            cwd=str(REPO_ROOT), capture_output=True, text=True, timeout=60,
+            encoding="utf-8", errors="replace")
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
         self.assertIn("ui_loaded:False", proc.stdout)
 
@@ -208,7 +212,9 @@ class InternalModeTests(ScriptFixtures):
         self.assertTrue(result.ok, result.stdout_text)
         self.assertEqual(result.argv[:4],
                          [sys.executable, "-m", "app.main", "--internal-run"])
-        self.assertEqual(Path(result.argv[4]).resolve(), script)
+        # Windows-temp может прийти 8.3-именем (RUNNER~1) — сравниваем нормализованно.
+        self.assertEqual(os.path.normcase(str(Path(result.argv[4]).resolve())),
+                         os.path.normcase(str(script.resolve())))
         payload = json.loads(Path(result.argv[5]).read_text(encoding="utf-8"))
         self.assertEqual(payload["argv"][0], str(self.tmp / "o.docx"))
         self.assertIn("argv:" + str(self.tmp / "o.docx"), result.lines)

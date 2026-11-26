@@ -31,6 +31,9 @@ def run_cli(*args: str, cwd: Path | None = None,
     return subprocess.run(
         [sys.executable, "-m", "app.cli", *args],
         cwd=str(cwd or REPO), capture_output=True, text=True, timeout=120,
+        # CLI пишет UTF-8 (app.cli_core.configure_console); декодировать надо именно
+        # им, иначе на Windows родитель падает в _readerthread и proc.stdout = None.
+        encoding="utf-8", errors="replace",
         env={**os.environ, **(env or {})} if env is not None else None,
     )
 
@@ -90,7 +93,8 @@ class TestCliBasics(unittest.TestCase):
             "import app.cli; rc = app.cli.main(['doctor', '--json']); sys.exit(rc)" % str(REPO)
         )
         proc = subprocess.run([sys.executable, "-c", code], cwd=str(REPO),
-                              capture_output=True, text=True, timeout=120)
+                              capture_output=True, text=True, timeout=120,
+                              encoding="utf-8", errors="replace")
         self.assertEqual(proc.returncode, 0, proc.stderr)
         env = parse_envelope(proc.stdout)
         self.assertTrue(env["ok"])

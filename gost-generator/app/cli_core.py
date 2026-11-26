@@ -34,6 +34,23 @@ def configure_console() -> None:
             stream.reconfigure(encoding="utf-8", errors="replace")
         except (AttributeError, ValueError):  # pragma: no cover - exotic streams
             pass
+    _windows_console_utf8()
+
+
+def _windows_console_utf8() -> None:
+    """Кодовая страница 65001 нужна самой консоли: UTF-8 в cmd.exe на cp866 читается
+    как «кракозябры». В pipe не вмешиваемся — там приёмник получает ровно UTF-8."""
+    if sys.platform != "win32":
+        return
+    try:
+        if not sys.stdout.isatty():
+            return
+        import ctypes
+
+        ctypes.windll.kernel32.SetConsoleOutputCP(65001)
+        ctypes.windll.kernel32.SetConsoleCP(65001)
+    except Exception:  # pragma: no cover - отсутствие kernel32/atty
+        pass
 
 
 class CliError(Exception):
