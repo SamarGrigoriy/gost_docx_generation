@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=ГОСТ-Генератор
+Name[en]=GOST Generator
+GenericName=Генератор документов ГОСТ
+GenericName[en]=GOST document generator
+Comment=Генерация и проверка учебных документов .docx по ГОСТ 7.32
+Comment[en]=Generate and validate .docx study documents per GOST 7.32
+Exec=gost-generator
+Icon=gost-generator
+Terminal=false
+Categories=Office;
+Keywords=docx;ГОСТ;реферат;техкарта;проверка;gost;document;

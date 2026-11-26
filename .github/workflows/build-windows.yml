@@ -1,0 +1,81 @@
+name: build-windows
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  tests-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install -r gost-generator/requirements-dev.txt
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+        working-directory: gost-generator
+
+  build-windows:
+    needs: tests-linux
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: gost-generator
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Build executables
+        run: pyinstaller build.spec --noconfirm
+      - name: Generate test fixtures for smoke
+        run: python tests/fixtures/make_fixtures.py
+      - name: CLI smoke test (без установленного Python)
+        shell: pwsh
+        run: |
+          .\dist\gost.exe doctor --json | Tee-Object -FilePath doctor.json
+          if ($LASTEXITCODE -ne 0) { exit 4 }
+          python -c "import json;d=json.load(open('doctor.json',encoding='utf-8'));assert d['schema_version']==1 and 'command' in d"
+          if ($LASTEXITCODE -ne 0) { exit 2 }
+          .\dist\gost.exe check tests\fixtures\fixtures_good.docx --format json --fail-on error
+          switch ($LASTEXITCODE) {
+            0 { }
+            1 { exit 1 }
+            default { exit 3 }
+          }
+      - name: GUI smoke test (окно собирается без Python)
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath .\dist\GostGenerator.exe -PassThru
+          Start-Sleep -Seconds 20
+          if ($p.HasExited) { Write-Error "GUI завершился сам, код $($p.ExitCode)"; exit 5 }
+          Stop-Process -Id $p.Id -Force
+      - name: Package release zip
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path staging
+          Copy-Item dist\GostGenerator.exe staging\
+          Copy-Item dist\gost.exe staging\
+          Copy-Item scripts staging\ -Recurse
+          Copy-Item presets staging\ -Recurse
+          Copy-Item profiles staging\ -Recurse
+          New-Item -ItemType File -Path staging\portable.flag
+          "ГОСТ-Генератор: запустите GostGenerator.exe (GUI) или gost.exe (CLI). Подробное руководство: https://github.com/${{ github.repository }}" | Out-File -Encoding utf8 staging\README.txt
+          Compress-Archive -Path staging\* -DestinationPath GostGenerator-windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GostGenerator-windows
+          path: gost-generator/GostGenerator-windows.zip
+      - name: Publish release asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: gost-generator/GostGenerator-windows.zip

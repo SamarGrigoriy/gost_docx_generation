@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# Артефакты сборки PyInstaller
+build/
+dist/
+
+# Данные приложения и результаты прогонов (не исходники)
+gost-generator/output/
+gost-generator/logs/
+gost-generator/data/
+gost-generator/portable.flag
+*.orig.docx
+
+# Фикстуры приёмки генерируются tests/fixtures/make_fixtures.py
+gost-generator/tests/fixtures/*.docx
+gost-generator/tests/fixtures/diag.png
+
+# Локальные настройки окружения
+gost.json
+.env

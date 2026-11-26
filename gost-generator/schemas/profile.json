@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gost/profile.schema.json",
+  "title": "Профиль метаданных (студент/работа/вуз)",
+  "type": "object",
+  "required": ["schema_version", "name", "person", "work", "institution"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "name": {"type": "string", "minLength": 1},
+    "person": {
+      "type": "object",
+      "properties": {
+        "fio": {"type": "string"},
+        "gruppa": {"type": "string"},
+        "prep": {"type": "string"},
+        "status": {"type": "string", "enum": ["студент", "преподаватель", "методист"]}
+      }
+    },
+    "work": {
+      "type": "object",
+      "properties": {
+        "work_type": {"type": "string"},
+        "pz_no": {"type": "string"},
+        "theme": {"type": "string"},
+        "disc": {"type": "string"},
+        "city": {"type": "string"},
+        "year": {"type": "integer", "minimum": 1900, "maximum": 2999}
+      }
+    },
+    "institution": {
+      "type": "object",
+      "properties": {
+        "ministry": {"type": "string"},
+        "fsbe": {"type": "string"},
+        "univ": {"type": "string"},
+        "kaf": {"type": "string"}
+      }
+    },
+    "extra": {
+      "type": "object",
+      "additionalProperties": {"type": ["string", "number", "boolean"]}
+    }
+  }
+}

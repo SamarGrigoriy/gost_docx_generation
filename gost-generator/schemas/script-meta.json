@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gost/script-meta.schema.json",
+  "title": "SCRIPT_META скрипта-генератора",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": {"type": "string", "minLength": 1},
+    "description": {"type": "string"},
+    "category": {"type": "string"},
+    "version": {"type": "string"},
+    "input": {"type": "string", "enum": ["none", "file_md", "file_docx", "text", "folder"]},
+    "output_ext": {"type": "string", "pattern": "^\\."},
+    "arg_template": {"type": "array", "items": {"type": "string"}},
+    "rules_hook": {"type": "string", "enum": ["native", "constants", "postprocess", "none"]},
+    "params": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "type"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"},
+          "label": {"type": "string"},
+          "type": {"type": "string", "enum": ["text", "textarea", "int", "float", "bool", "select", "file", "folder", "date"]},
+          "options": {"type": "array", "items": {"type": ["string", "number"]}},
+          "default": {},
+          "required": {"type": "boolean"},
+          "help": {"type": "string"}
+        }
+      }
+    }
+  }
+}

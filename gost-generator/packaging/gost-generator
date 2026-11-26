@@ -1,0 +1,12 @@
+#!/bin/sh
+# Запуск «ГОСТ-Генератора» из исходников: GUI через venv, если он есть.
+# Файл лежит в packaging/, но вызывается и по симлинку из ~/.local/bin — путь
+# разрешаем по symlink'у, иначе каталог приложения не находится.
+set -e
+SELF=$(readlink -f "$0" 2>/dev/null || printf '%s' "$0")
+HERE=$(CDPATH= cd -- "$(dirname -- "$SELF")" && pwd)
+DIR=$(CDPATH= cd -- "$HERE/.." && pwd)
+PY="$DIR/venv/bin/python"
+[ -x "$PY" ] || PY=$(command -v python3)
+cd "$DIR"
+exec "$PY" -m app "$@"

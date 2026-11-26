@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "script": "make_karta.py",
+  "params": { "theme": "Моя семья", "age_group": "3-4", "duration_min": 15 },
+  "rules": "pedagogical",
+  "profile": "default",
+  "output": "output/karta.docx",
+  "post": { "normalize": true, "check": true, "fail_on": "error" }
+}

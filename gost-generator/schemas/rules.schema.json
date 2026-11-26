@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gost/rules.schema.json",
+  "title": "Пресет правил оформления ГОСТ-Генератора",
+  "type": "object",
+  "required": ["schema_version", "name", "page", "text"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "name": {"type": "string", "minLength": 1},
+    "builtin": {"type": "boolean"},
+    "strict": {"type": "boolean"},
+    "page": {
+      "type": "object",
+      "required": ["size", "orientation"],
+      "properties": {
+        "size": {"type": "string", "enum": ["A4"]},
+        "orientation": {"type": "string", "enum": ["portrait", "landscape"]},
+        "margin_left_mm": {"type": "number", "minimum": 5, "maximum": 60},
+        "margin_right_mm": {"type": "number", "minimum": 5, "maximum": 60},
+        "margin_top_mm": {"type": "number", "minimum": 5, "maximum": 60},
+        "margin_bottom_mm": {"type": "number", "minimum": 5, "maximum": 60},
+        "footer_distance_mm": {"type": "number", "minimum": 0, "maximum": 50}
+      }
+    },
+    "text": {
+      "type": "object",
+      "required": ["font", "size_pt", "line_spacing"],
+      "properties": {
+        "font": {"type": "string"},
+        "size_pt": {"type": "number", "minimum": 6, "maximum": 72},
+        "line_spacing": {"type": "number", "minimum": 0.5, "maximum": 3},
+        "first_line_indent_cm": {"type": "number", "minimum": 0, "maximum": 5},
+        "alignment": {"type": "string", "enum": ["left", "center", "right", "justify"]},
+        "space_before_pt": {"type": "number", "minimum": 0},
+        "space_after_pt": {"type": "number", "minimum": 0},
+        "allow_italic_for_terms_only": {"type": "boolean"},
+        "hyphenation": {"type": "boolean"}
+      }
+    },
+    "headings": {"type": "object"},
+    "figures": {
+      "type": "object",
+      "properties": {
+        "caption_template": {"type": "string"},
+        "caption_position": {"type": "string", "enum": ["below", "above"]},
+        "caption_align": {"type": "string", "enum": ["left", "center", "right", "justify"]},
+        "numbering": {"type": "string", "enum": ["continuous", "by_section"]},
+        "max_width_cm": {"type": "number", "minimum": 1},
+        "max_height_cm": {"type": "number", "minimum": 1},
+        "require_reference_in_text": {"type": "boolean"}
+      }
+    },
+    "tables": {
+      "type": "object",
+      "properties": {
+        "caption_template": {"type": "string"},
+        "caption_position": {"type": "string", "enum": ["below", "above"]},
+        "caption_align": {"type": "string", "enum": ["left", "center", "right", "justify"]},
+        "repeat_header": {"type": "boolean"},
+        "header_bold": {"type": "boolean"},
+        "font_size_pt": {"type": "number", "minimum": 6, "maximum": 72},
+        "line_spacing": {"type": "number", "minimum": 0.5, "maximum": 3},
+        "allow_row_split": {"type": "boolean"},
+        "require_reference_in_text": {"type": "boolean"}
+      }
+    },
+    "formulas": {"type": "object"},
+    "notes": {"type": "object"},
+    "footnotes": {
+      "type": "object",
+      "properties": {
+        "font": {"type": "string"},
+        "size_pt": {"type": "number", "minimum": 6, "maximum": 72},
+        "min_allowed_size_pt": {"type": "number", "minimum": 6, "maximum": 72}
+      }
+    },
+    "references": {
+      "type": "object",
+      "properties": {
+        "style": {"type": "string"},
+        "bibliography_order": {"type": "string", "enum": ["by_appearance", "alphabetical"]},
+        "max_source_age_years": {"type": "integer", "minimum": 0},
+        "min_cited_percent": {"type": "integer", "minimum": 0, "maximum": 100}
+      }
+    },
+    "appendices": {"type": "object"},
+    "toc": {
+      "type": "object",
+      "properties": {
+        "required": {"type": "boolean"},
+        "auto": {"type": "boolean"}
+      }
+    },
+    "numbering": {
+      "type": "object",
+      "properties": {
+        "position": {"type": "string", "enum": ["bottom_center", "top_center", "top_right", "none"]},
+        "title_page_numbered": {"type": "boolean"},
+        "second_page_shows": {"type": "integer", "minimum": 1},
+        "font_size_pt": {"type": "number", "minimum": 6}
+      }
+    },
+    "volume": {"type": "object"},
+    "code_blocks": {
+      "type": "object",
+      "properties": {
+        "font": {"type": "string"},
+        "size_pt": {"type": "number", "minimum": 6},
+        "line_spacing": {"type": "number", "minimum": 0.5},
+        "indent": {"type": "boolean"}
+      }
+    }
+  }
+}

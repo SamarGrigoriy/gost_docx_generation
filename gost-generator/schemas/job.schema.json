@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gost/job.schema.json",
+  "title": "Декларативная задача gost job run",
+  "type": "object",
+  "required": ["schema_version", "script"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "script": {"type": "string", "minLength": 1},
+    "params": {"type": "object"},
+    "input": {"type": "string"},
+    "rules": {"type": "string"},
+    "profile": {"type": "string"},
+    "output": {"type": "string"},
+    "post": {
+      "type": "object",
+      "properties": {
+        "normalize": {"type": "boolean"},
+        "check": {"type": "boolean"},
+        "fail_on": {"type": "string", "enum": ["error", "warning", "never"]}
+      }
+    }
+  }
+}

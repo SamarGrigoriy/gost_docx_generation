@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "name": "ГОСТ 7.32 (Мультиворк)",
+  "builtin": true,
+  "strict": true,
+  "page": {
+    "size": "A4",
+    "orientation": "portrait",
+    "margin_left_mm": 30,
+    "margin_right_mm": 15,
+    "margin_top_mm": 20,
+    "margin_bottom_mm": 20,
+    "footer_distance_mm": 12.5
+  },
+  "text": {
+    "font": "Times New Roman",
+    "size_pt": 14,
+    "line_spacing": 1.5,
+    "first_line_indent_cm": 1.25,
+    "alignment": "justify",
+    "space_before_pt": 0,
+    "space_after_pt": 0,
+    "allow_italic_for_terms_only": true,
+    "hyphenation": false
+  },
+  "headings": {
+    "structural_uppercase": true,
+    "structural_bold": true,
+    "structural_align": "center",
+    "structural_new_page": true,
+    "structural_no_trailing_dot": true,
+    "section_bold": true,
+    "section_from_indent": true,
+    "section_numbering": "1",
+    "subsection_numbering": "1.1",
+    "no_trailing_dot": true,
+    "multiline_line_spacing": 1.0,
+    "keep_with_next": true,
+    "min_lines_after": 3,
+    "same_size_as_body": true
+  },
+  "figures": {
+    "caption_template": "Рисунок {n} – {title}",
+    "caption_position": "below",
+    "caption_align": "center",
+    "caption_indent": false,
+    "caption_no_trailing_dot": true,
+    "numbering": "continuous",
+    "dash": "–",
+    "max_width_cm": 15,
+    "max_height_cm": 18,
+    "require_reference_in_text": true,
+    "reference_template": "в соответствии с рисунком {n}"
+  },
+  "tables": {
+    "caption_template": "Таблица {n} – {title}",
+    "caption_position": "above",
+    "caption_align": "left",
+    "caption_indent": false,
+    "caption_no_trailing_dot": true,
+    "continuation_text": "Продолжение таблицы {n}",
+    "continuation_align": "right",
+    "repeat_header": true,
+    "header_bold": true,
+    "borders": "single_thin",
+    "border_size_eighths_pt": 4,
+    "font_size_pt": 12,
+    "line_spacing": 1.0,
+    "cell_vertical_align": "center",
+    "layout": "fixed",
+    "allow_row_split": true,
+    "require_reference_in_text": true
+  },
+  "formulas": {
+    "own_line": true,
+    "align": "center",
+    "blank_line_above_below": true,
+    "number_format": "({n})",
+    "number_align": "right",
+    "explanation_first_word": "где",
+    "explanation_no_colon": true
+  },
+  "notes": {
+    "prefix": "Примечание",
+    "dash": "–",
+    "from_indent": true,
+    "numbered_when_multiple": true
+  },
+  "footnotes": {
+    "font": "Times New Roman",
+    "size_pt": 12,
+    "min_allowed_size_pt": 10,
+    "superscript_no_space": true
+  },
+  "references": {
+    "style": "square_brackets",
+    "bracket_template": "[{n}, с. {page}]",
+    "bibliography_order": "by_appearance",
+    "bibliography_numbering": "1.",
+    "bibliography_from_indent": true,
+    "max_source_age_years": 5,
+    "min_cited_percent": 80
+  },
+  "appendices": {
+    "label": "ПРИЛОЖЕНИЕ {letter}",
+    "new_page": true,
+    "label_align": "center",
+    "title_bold": true,
+    "title_align": "center",
+    "letters_exclude": ["Ё", "З", "Й", "О", "Ч", "Ъ", "Ы", "Ь"]
+  },
+  "toc": { "required": true, "auto": true },
+  "numbering": {
+    "position": "bottom_center",
+    "title_page_numbered": false,
+    "second_page_shows": 2,
+    "font_size_pt": 12
+  },
+  "volume": {
+    "count_from": "introduction",
+    "count_to": "conclusion_end",
+    "min_page_fill_percent": 80,
+    "min_last_page_fill_percent": 33
+  },
+  "code_blocks": {
+    "font": "Consolas",
+    "size_pt": 10,
+    "line_spacing": 1.0,
+    "indent": false
+  }
+}

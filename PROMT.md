@@ -48,17 +48,17 @@
 
 ## 2. Стек — зафиксирован, не менять
 
-| Слой | Технология |
-|---|---|
-| Язык | Python 3.11+ |
-| GUI | **CustomTkinter ≥ 5.2** |
-| Иконки/изображения | **Pillow ≥ 10.0** |
-| Сборка exe | **PyInstaller ≥ 6.0** |
-| CI | **GitHub Actions**, `windows-latest` |
-| Конфиги | JSON (stdlib `json`) |
-| Работа с DOCX | **только stdlib**: `zipfile`, `xml.etree.ElementTree`, `re` |
-| Процессы | `subprocess`, `threading`, `queue`, `runpy`, `multiprocessing` |
-| Тесты | `unittest` (stdlib) |
+| Слой               | Технология                                                     |
+| ------------------ | -------------------------------------------------------------- |
+| Язык               | Python 3.11+                                                   |
+| GUI                | **CustomTkinter ≥ 5.2**                                        |
+| Иконки/изображения | **Pillow ≥ 10.0**                                              |
+| Сборка exe         | **PyInstaller ≥ 6.0**                                          |
+| CI                 | **GitHub Actions**, `windows-latest`                           |
+| Конфиги            | JSON (stdlib `json`)                                           |
+| Работа с DOCX      | **только stdlib**: `zipfile`, `xml.etree.ElementTree`, `re`    |
+| Процессы           | `subprocess`, `threading`, `queue`, `runpy`, `multiprocessing` |
+| Тесты              | `unittest` (stdlib)                                            |
 
 **Запрещено:** PyQt/PySide, Flet, NiceGUI, Kivy, Electron, любые веб-фреймворки, `python-docx`, `lxml`,
 `pandas`, БД, сетевые запросы. Приложение полностью офлайн. Runtime-зависимостей ровно две:
@@ -72,6 +72,7 @@
 ## 3. Окружение, запуск, сборка
 
 ### 3.1 Разработка (Debian)
+
 ```bash
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements-dev.txt
@@ -100,6 +101,7 @@ python -m unittest discover -s tests -v
 Никакого `shell=True`. Аргументы — только списком.
 
 ### 3.3 Каталоги данных
+
 - **Portable-режим** (по умолчанию для exe): если рядом с exe есть `portable.flag` или каталог
   доступен на запись — данные рядом: `scripts/`, `presets/`, `profiles/`, `output/`, `logs/`, `state.json`.
 - Иначе: `%APPDATA%\GostGenerator` (Windows), `~/.config/GostGenerator` (Linux).
@@ -170,18 +172,19 @@ gost-generator/
 
 ### 5.1 Страница и основной текст
 
-| Параметр | Значение |
-|---|---|
-| Формат | A4, книжная |
-| Поля | левое 30 мм, правое 15 мм, верхнее и нижнее 20 мм |
-| Шрифт | Times New Roman 14 pt (сноски 12, допустимо 10) |
-| Межстрочный | 1,5; многострочные заголовки — 1,0; до/после абзаца 0 |
-| Абзацный отступ | 1,25 см |
-| Выравнивание | по ширине |
-| Номер страницы | внизу по центру; титул без номера; **вторая страница показывает «2»** |
-| Курсив | только термины/латынь/акценты |
+| Параметр        | Значение                                                              |
+| --------------- | --------------------------------------------------------------------- |
+| Формат          | A4, книжная                                                           |
+| Поля            | левое 30 мм, правое 15 мм, верхнее и нижнее 20 мм                     |
+| Шрифт           | Times New Roman 14 pt (сноски 12, допустимо 10)                       |
+| Межстрочный     | 1,5; многострочные заголовки — 1,0; до/после абзаца 0                 |
+| Абзацный отступ | 1,25 см                                                               |
+| Выравнивание    | по ширине                                                             |
+| Номер страницы  | внизу по центру; титул без номера; **вторая страница показывает «2»** |
+| Курсив          | только термины/латынь/акценты                                         |
 
 ### 5.2 Заголовки
+
 - Структурные элементы (`РЕФЕРАТ`, `СОДЕРЖАНИЕ`, `ВВЕДЕНИЕ`, `ЗАКЛЮЧЕНИЕ`,
   `СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ`, `ПРИЛОЖЕНИЕ`) — **с новой страницы, ПРОПИСНЫМИ
   ПОЛУЖИРНЫМИ по центру**, без точки, без переносов, не подчёркивая.
@@ -192,6 +195,7 @@ gost-generator/
 - Кегль заголовков **не больше** основного текста.
 
 ### 5.3 Рисунки
+
 - Сразу после первого упоминания в тексте (или на следующей странице).
 - Подпись **под** рисунком **по центру**: `Рисунок N – Название` (тире «–», с прописной, без точки, без переносов).
 - Нумерация сквозная; допустима по разделам (`Рисунок 1.1`).
@@ -200,6 +204,7 @@ gost-generator/
 - Графика из Word/Excel, не сканы; ссылка на источник из списка литературы.
 
 ### 5.4 Таблицы
+
 - Название **над** таблицей **слева без абзацного отступа**: `Таблица N – Название`, с прописной, без точки.
 - Многострочное название — через один межстрочный интервал.
 - Перенос: над первой частью название один раз слева, над остальными — **справа**
@@ -208,6 +213,7 @@ gost-generator/
 - Границы тонкие сплошные. Материал из Word/Excel, не сканы.
 
 ### 5.5 Формулы, примечания, сноски
+
 - Формула — отдельной строкой по центру, выше и ниже не менее одной пустой строки;
   номер `(N)` у правого края; ссылка «в формуле (N)».
 - Пояснения под формулой, каждый символ с новой строки, первая строка — «где» **без двоеточия**, с абзаца.
@@ -217,6 +223,7 @@ gost-generator/
   линией слева; TNR 12 (допустимо 10).
 
 ### 5.6 Ссылки, источники, содержание, приложения
+
 - Затекстовые `[34, с. 78]` или подстрочные сноски.
 - Список — **в порядке появления ссылок**, `1.`, `2.` с точкой и абзацным отступом.
 - Литература **не старше 5 лет**; ссылки минимум на **80 %** источников.
@@ -226,6 +233,7 @@ gost-generator/
   Ссылки на все приложения, порядок — по ссылкам в тексте.
 
 ### 5.7 Объём и структура
+
 - Страница заполнена ≥ 80 % (последняя в разделе ≥ 1/3). Объём считается от введения до конца заключения.
 - Введение: актуальность, проблема/гипотеза (ВКР), объект, предмет, цель, задачи, методы,
   практическая значимость, обзор литературы, структура.
@@ -234,7 +242,9 @@ gost-generator/
 - Орфография проверена; недопустимо путать типы работ («диплом» в курсовой).
 
 ### 5.8 Педагогические документы (отдельный класс, не ГОСТ)
+
 Технологическая карта занятия, конспект, подборка игр:
+
 - допускалась **альбомная** ориентация A4 для многоколоночных таблиц;
 - шапка документа TNR 14, текст таблицы TNR 12, интервал 1,0;
 - шапка таблицы повторяется на каждой странице, полужирная, по центру;
@@ -251,6 +261,7 @@ gost-generator/
 Эти документы идут с пресетом `pedagogical.json` (`strict: false`), ГОСТ-проверки к ним не применяются.
 
 ### 5.9 Оригинальность (вне оформления, справочно)
+
 Система клиента (Антиплагиат.ру/ВУЗ, ETXT); проверка от введения до конца списка литературы;
 технические накрутки запрещены; блок с одного сайта ≤ 50 %. **В приложении не автоматизировать.**
 
@@ -258,14 +269,14 @@ gost-generator/
 
 ## 6. Единицы измерения (`units.py`, покрыть тестами)
 
-| Величина | Соотношение |
-|---|---|
-| 1 мм | 56.6929 twips |
-| 1 см | 566.929 twips |
-| 1 pt | 2 half-points (`w:sz`) |
+| Величина                 | Соотношение                                      |
+| ------------------------ | ------------------------------------------------ |
+| 1 мм                     | 56.6929 twips                                    |
+| 1 см                     | 566.929 twips                                    |
+| 1 pt                     | 2 half-points (`w:sz`)                           |
 | Интервал 1.0 / 1.5 / 2.0 | `w:line` = 240 / 360 / 480 при `lineRule="auto"` |
-| A4 книжная | `w:w=11906 w:h=16838` |
-| A4 альбомная | `w:w=16838 w:h=11906 w:orient="landscape"` |
+| A4 книжная               | `w:w=11906 w:h=16838`                            |
+| A4 альбомная             | `w:w=16838 w:h=11906 w:orient="landscape"`       |
 
 Опорные значения ГОСТ: поля 30/15/20/20 мм → `1701/850/1134/1134`; отступ 1,25 см → `709`;
 14 pt → `28`; 12 pt → `24`; 10 pt → `20`; 1 см = 360000 EMU (размеры изображений).
@@ -284,86 +295,135 @@ gost-generator/
   "builtin": true,
   "strict": true,
   "page": {
-    "size": "A4", "orientation": "portrait",
-    "margin_left_mm": 30, "margin_right_mm": 15,
-    "margin_top_mm": 20, "margin_bottom_mm": 20,
+    "size": "A4",
+    "orientation": "portrait",
+    "margin_left_mm": 30,
+    "margin_right_mm": 15,
+    "margin_top_mm": 20,
+    "margin_bottom_mm": 20,
     "footer_distance_mm": 12.5
   },
   "text": {
-    "font": "Times New Roman", "size_pt": 14, "line_spacing": 1.5,
-    "first_line_indent_cm": 1.25, "alignment": "justify",
-    "space_before_pt": 0, "space_after_pt": 0,
-    "allow_italic_for_terms_only": true, "hyphenation": false
+    "font": "Times New Roman",
+    "size_pt": 14,
+    "line_spacing": 1.5,
+    "first_line_indent_cm": 1.25,
+    "alignment": "justify",
+    "space_before_pt": 0,
+    "space_after_pt": 0,
+    "allow_italic_for_terms_only": true,
+    "hyphenation": false
   },
   "headings": {
-    "structural_uppercase": true, "structural_bold": true,
-    "structural_align": "center", "structural_new_page": true,
+    "structural_uppercase": true,
+    "structural_bold": true,
+    "structural_align": "center",
+    "structural_new_page": true,
     "structural_no_trailing_dot": true,
-    "section_bold": true, "section_from_indent": true,
-    "section_numbering": "1", "subsection_numbering": "1.1",
-    "no_trailing_dot": true, "multiline_line_spacing": 1.0,
-    "keep_with_next": true, "min_lines_after": 3, "same_size_as_body": true
+    "section_bold": true,
+    "section_from_indent": true,
+    "section_numbering": "1",
+    "subsection_numbering": "1.1",
+    "no_trailing_dot": true,
+    "multiline_line_spacing": 1.0,
+    "keep_with_next": true,
+    "min_lines_after": 3,
+    "same_size_as_body": true
   },
   "figures": {
     "caption_template": "Рисунок {n} – {title}",
-    "caption_position": "below", "caption_align": "center",
-    "caption_indent": false, "caption_no_trailing_dot": true,
-    "numbering": "continuous", "dash": "–",
-    "max_width_cm": 15, "max_height_cm": 18,
+    "caption_position": "below",
+    "caption_align": "center",
+    "caption_indent": false,
+    "caption_no_trailing_dot": true,
+    "numbering": "continuous",
+    "dash": "–",
+    "max_width_cm": 15,
+    "max_height_cm": 18,
     "require_reference_in_text": true,
     "reference_template": "в соответствии с рисунком {n}"
   },
   "tables": {
     "caption_template": "Таблица {n} – {title}",
-    "caption_position": "above", "caption_align": "left",
-    "caption_indent": false, "caption_no_trailing_dot": true,
-    "continuation_text": "Продолжение таблицы {n}", "continuation_align": "right",
-    "repeat_header": true, "header_bold": true,
-    "borders": "single_thin", "border_size_eighths_pt": 4,
-    "font_size_pt": 12, "line_spacing": 1.0,
-    "cell_vertical_align": "center", "layout": "fixed",
-    "allow_row_split": true, "require_reference_in_text": true
+    "caption_position": "above",
+    "caption_align": "left",
+    "caption_indent": false,
+    "caption_no_trailing_dot": true,
+    "continuation_text": "Продолжение таблицы {n}",
+    "continuation_align": "right",
+    "repeat_header": true,
+    "header_bold": true,
+    "borders": "single_thin",
+    "border_size_eighths_pt": 4,
+    "font_size_pt": 12,
+    "line_spacing": 1.0,
+    "cell_vertical_align": "center",
+    "layout": "fixed",
+    "allow_row_split": true,
+    "require_reference_in_text": true
   },
   "formulas": {
-    "own_line": true, "align": "center", "blank_line_above_below": true,
-    "number_format": "({n})", "number_align": "right",
-    "explanation_first_word": "где", "explanation_no_colon": true
+    "own_line": true,
+    "align": "center",
+    "blank_line_above_below": true,
+    "number_format": "({n})",
+    "number_align": "right",
+    "explanation_first_word": "где",
+    "explanation_no_colon": true
   },
   "notes": {
-    "prefix": "Примечание", "dash": "–",
-    "from_indent": true, "numbered_when_multiple": true
+    "prefix": "Примечание",
+    "dash": "–",
+    "from_indent": true,
+    "numbered_when_multiple": true
   },
   "footnotes": {
-    "font": "Times New Roman", "size_pt": 12,
-    "min_allowed_size_pt": 10, "superscript_no_space": true
+    "font": "Times New Roman",
+    "size_pt": 12,
+    "min_allowed_size_pt": 10,
+    "superscript_no_space": true
   },
   "references": {
-    "style": "square_brackets", "bracket_template": "[{n}, с. {page}]",
-    "bibliography_order": "by_appearance", "bibliography_numbering": "1.",
+    "style": "square_brackets",
+    "bracket_template": "[{n}, с. {page}]",
+    "bibliography_order": "by_appearance",
+    "bibliography_numbering": "1.",
     "bibliography_from_indent": true,
-    "max_source_age_years": 5, "min_cited_percent": 80
+    "max_source_age_years": 5,
+    "min_cited_percent": 80
   },
   "appendices": {
-    "label": "ПРИЛОЖЕНИЕ {letter}", "new_page": true, "label_align": "center",
-    "title_bold": true, "title_align": "center",
-    "letters_exclude": ["Ё","З","Й","О","Ч","Ъ","Ы","Ь"]
+    "label": "ПРИЛОЖЕНИЕ {letter}",
+    "new_page": true,
+    "label_align": "center",
+    "title_bold": true,
+    "title_align": "center",
+    "letters_exclude": ["Ё", "З", "Й", "О", "Ч", "Ъ", "Ы", "Ь"]
   },
   "toc": { "required": true, "auto": true },
   "numbering": {
-    "position": "bottom_center", "title_page_numbered": false,
-    "second_page_shows": 2, "font_size_pt": 12
+    "position": "bottom_center",
+    "title_page_numbered": false,
+    "second_page_shows": 2,
+    "font_size_pt": 12
   },
   "volume": {
-    "count_from": "introduction", "count_to": "conclusion_end",
-    "min_page_fill_percent": 80, "min_last_page_fill_percent": 33
+    "count_from": "introduction",
+    "count_to": "conclusion_end",
+    "min_page_fill_percent": 80,
+    "min_last_page_fill_percent": 33
   },
   "code_blocks": {
-    "font": "Consolas", "size_pt": 10, "line_spacing": 1.0, "indent": false
+    "font": "Consolas",
+    "size_pt": 10,
+    "line_spacing": 1.0,
+    "indent": false
   }
 }
 ```
 
 Остальные пресеты:
+
 - `multivork.json` — копия с `name: "Мультиворк (базовый)"`.
 - `pedagogical.json` — `strict: false`, `page.orientation: "landscape"`, поля 20 мм со всех сторон,
   `text.size_pt: 14`, `text.line_spacing: 1.0`, `text.first_line_indent_cm: 0`,
@@ -382,12 +442,17 @@ gost-generator/
   "person": { "fio": "", "gruppa": "", "prep": "", "status": "студент" },
   "work": {
     "work_type": "Отчёт по практическому занятию",
-    "pz_no": "", "theme": "", "disc": "", "city": "", "year": 2026
+    "pz_no": "",
+    "theme": "",
+    "disc": "",
+    "city": "",
+    "year": 2026
   },
   "institution": {
     "ministry": "МИНИСТЕРСТВО НАУКИ И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ",
     "fsbe": "ФЕДЕРАЛЬНОЕ ГОСУДАРСТВЕННОЕ БЮДЖЕТНОЕ ОБРАЗОВАТЕЛЬНОЕ УЧРЕЖДЕНИЕ ВЫСШЕГО ОБРАЗОВАНИЯ",
-    "univ": "", "kaf": ""
+    "univ": "",
+    "kaf": ""
   },
   "extra": {}
 }
@@ -402,6 +467,7 @@ gost-generator/
 - Профилей может быть несколько (разные студенты/группы/вузы), CRUD + импорт/экспорт JSON.
 
 ### 7.3 `state.json`
+
 Активный пресет, активный профиль, каталог скриптов, каталог вывода, тема (dark/light/system),
 масштаб UI (100/110/125 %), таймаут скрипта (по умолчанию 120 с), режим интерпретатора,
 последние 10 открытых файлов, геометрия окна, флаг «применять нормализацию после генерации».
@@ -436,6 +502,7 @@ SCRIPT_META = {
 а также `{param_id}` для любого параметра.
 
 ### 8.1 Стратегии применения правил (`rules_hook`)
+
 - **native** — скрипт объявляет `run(params: dict, rules: dict, profile: dict) -> dict`
   или `build(md_path, out_path, meta, rules=None)`. Правила передаются напрямую. Предпочтительно.
 - **constants** — скрипт имеет модульные константы (`PT14`, `IND_FIRST`, `MAR_*`, `LINE_15`, `TNR`).
@@ -445,12 +512,14 @@ SCRIPT_META = {
 - **none** — не применять правила (для служебных скриптов).
 
 ### 8.2 Скрипты без `SCRIPT_META`
+
 Показывать в списке по имени файла с пометкой «без метаданных». Форма: универсальные поля
 «Входной файл», «Выходной файл», «Дополнительные аргументы» (свободная строка),
 выбор `rules_hook` вручную. Кнопка «Сохранить описание» — создаёт sidecar-файл
 `scripts/<name>.meta.json` с той же схемой, чтобы в следующий раз форма была полноценной.
 
 ### 8.3 Обнаружение
+
 Сканирование каталога скриптов при старте и по кнопке «Обновить» (F5). Парсинг `SCRIPT_META`
 через `ast` (**без импорта и исполнения кода** — безопасно). Битый скрипт не должен ломать список:
 показывать с иконкой ошибки и текстом проблемы. Кнопка «Добавить скрипт…» — выбор любого `.py`
@@ -461,6 +530,7 @@ SCRIPT_META = {
 ## 9. Ядро: обязанности модулей
 
 ### `runner.py`
+
 Запуск в отдельном потоке, вывод построчно в `queue` → лог-панель. Никогда не блокировать UI.
 Отмена (terminate → kill по истечении 3 с), таймаут с принудительным завершением, код возврата,
 замер времени. После успешной генерации: если `rules_hook == postprocess` и включена нормализация —
@@ -468,7 +538,9 @@ SCRIPT_META = {
 Запись сессии в лог-файл.
 
 ### `docx_normalizer.py`
+
 Приведение готового `.docx` к активным правилам. Только stdlib: распаковка zip, правка XML, упаковка обратно.
+
 - `styles.xml`: `docDefaults` + `Normal` (шрифт, кегль, интервал, отступ, выравнивание);
   стили `Heading1..4` (полужирные, кегль не больше основного, `keepNext`, интервал 1,0 для многострочных).
 - `document.xml`: `sectPr` → `pgSz`/`pgMar` по правилам; колонтитул с полем `PAGE` внизу по центру;
@@ -487,48 +559,50 @@ SCRIPT_META = {
 - Отчёт нормализатора: список выполненных изменений (человекочитаемо) в лог.
 
 ### `docx_inspector.py`
+
 Проверка **по активным правилам**, а не по зашитым значениям. Возвращает список замечаний:
 `{code, severity, message, location, hint}`, где `severity ∈ {error, warning, info}`,
 `location` — номер абзаца/страницы-оценка + фрагмент текста.
 
-| Код | Проверка | Severity |
-|---|---|---|
-| `PAGE_MARGINS` | поля из `sectPr` совпадают с правилами (±0,5 мм) | error |
-| `PAGE_SIZE` | формат и ориентация | error |
-| `FONT_MAIN` | **реальный** шрифт основного текста по `rFonts` (не «всё не-Consolas = TNR») | error |
-| `SIZE_MAIN` | основной кегль = правило; таблицы/код учитывать отдельно | error |
-| `LINE_SPACING` | основной интервал = правило | error |
-| `INDENT_VALUE` | `firstLine` = правило (±5 twips), а не просто «есть отступ» | error |
-| `ALIGNMENT` | выравнивание основного текста | warning |
-| `SPACING_PARA` | интервалы до/после абзаца = 0 | warning |
-| `NUM_POSITION` | номер страницы внизу по центру | error |
-| `NUM_START` | титул без номера, вторая страница = «2» | error |
-| `HEAD_STRUCT` | структурные элементы: ПРОПИСНЫЕ, полужирные, по центру, с новой страницы, без точки | error |
-| `HEAD_KEEP` | `keepNext` у заголовков (заголовок не в конце листа) | warning |
-| `HEAD_SIZE` | кегль заголовка не больше основного | warning |
-| `FIG_CAPTION` | формат `Рисунок N – …`, позиция под рисунком, по центру, без точки | error |
-| `FIG_COUNT` | число изображений ≤ число подписей | error |
-| `FIG_ORDER` | сквозная нумерация без пропусков и повторов | warning |
-| `FIG_REF` | на каждый рисунок есть ссылка в тексте | warning |
-| `TBL_CAPTION` | `Таблица N – …` над таблицей, слева, без отступа, без точки | error |
-| `TBL_HEADER` | шапка повторяется (`tblHeader`) и полужирная | warning |
-| `TBL_BORDERS` | тонкие сплошные границы | warning |
-| `TBL_ORDER` | нумерация по порядку появления | warning |
-| `TBL_REF` | ссылка «в таблице N» в тексте | warning |
-| `FORMULA` | номер `(N)` у правого края, «где» без двоеточия | warning |
-| `FOOTNOTE_FONT` | шрифт/кегль сносок | warning |
-| `TOC_PRESENT` | наличие автосодержания (поле `TOC`) | error |
-| `BIB_ORDER` | список источников в порядке упоминания | warning |
-| `BIB_AGE` | год источника ≥ текущий год − `max_source_age_years` | warning |
-| `BIB_COVERAGE` | процитировано ≥ `min_cited_percent` % записей | warning |
-| `APPENDIX` | буквы приложений, исключённые буквы, новая страница | warning |
-| `VOLUME_FILL` | заполненность страниц (эвристика) | info |
-| `MANUAL` | что нельзя проверить автоматически (орфография, сканы, оригинальность) | info |
+| Код             | Проверка                                                                            | Severity |
+| --------------- | ----------------------------------------------------------------------------------- | -------- |
+| `PAGE_MARGINS`  | поля из `sectPr` совпадают с правилами (±0,5 мм)                                    | error    |
+| `PAGE_SIZE`     | формат и ориентация                                                                 | error    |
+| `FONT_MAIN`     | **реальный** шрифт основного текста по `rFonts` (не «всё не-Consolas = TNR»)        | error    |
+| `SIZE_MAIN`     | основной кегль = правило; таблицы/код учитывать отдельно                            | error    |
+| `LINE_SPACING`  | основной интервал = правило                                                         | error    |
+| `INDENT_VALUE`  | `firstLine` = правило (±5 twips), а не просто «есть отступ»                         | error    |
+| `ALIGNMENT`     | выравнивание основного текста                                                       | warning  |
+| `SPACING_PARA`  | интервалы до/после абзаца = 0                                                       | warning  |
+| `NUM_POSITION`  | номер страницы внизу по центру                                                      | error    |
+| `NUM_START`     | титул без номера, вторая страница = «2»                                             | error    |
+| `HEAD_STRUCT`   | структурные элементы: ПРОПИСНЫЕ, полужирные, по центру, с новой страницы, без точки | error    |
+| `HEAD_KEEP`     | `keepNext` у заголовков (заголовок не в конце листа)                                | warning  |
+| `HEAD_SIZE`     | кегль заголовка не больше основного                                                 | warning  |
+| `FIG_CAPTION`   | формат `Рисунок N – …`, позиция под рисунком, по центру, без точки                  | error    |
+| `FIG_COUNT`     | число изображений ≤ число подписей                                                  | error    |
+| `FIG_ORDER`     | сквозная нумерация без пропусков и повторов                                         | warning  |
+| `FIG_REF`       | на каждый рисунок есть ссылка в тексте                                              | warning  |
+| `TBL_CAPTION`   | `Таблица N – …` над таблицей, слева, без отступа, без точки                         | error    |
+| `TBL_HEADER`    | шапка повторяется (`tblHeader`) и полужирная                                        | warning  |
+| `TBL_BORDERS`   | тонкие сплошные границы                                                             | warning  |
+| `TBL_ORDER`     | нумерация по порядку появления                                                      | warning  |
+| `TBL_REF`       | ссылка «в таблице N» в тексте                                                       | warning  |
+| `FORMULA`       | номер `(N)` у правого края, «где» без двоеточия                                     | warning  |
+| `FOOTNOTE_FONT` | шрифт/кегль сносок                                                                  | warning  |
+| `TOC_PRESENT`   | наличие автосодержания (поле `TOC`)                                                 | error    |
+| `BIB_ORDER`     | список источников в порядке упоминания                                              | warning  |
+| `BIB_AGE`       | год источника ≥ текущий год − `max_source_age_years`                                | warning  |
+| `BIB_COVERAGE`  | процитировано ≥ `min_cited_percent` % записей                                       | warning  |
+| `APPENDIX`      | буквы приложений, исключённые буквы, новая страница                                 | warning  |
+| `VOLUME_FILL`   | заполненность страниц (эвристика)                                                   | info     |
+| `MANUAL`        | что нельзя проверить автоматически (орфография, сканы, оригинальность)              | info     |
 
 При `strict: false` все `error` понижаются до `warning`. Проверки, не относящиеся к пресету
 (например ГОСТ-проверки для педагогического пресета), отключаются по ключам правил.
 
 ### `report.py`
+
 Формирование отчёта: заголовок (файл, дата, пресет, строгий режим), сводка (N ошибок / M предупреждений),
 таблица замечаний, блок «проверить вручную». Экспорт `.md` и `.txt`. Пакетный режим — сводная таблица
 по файлам + возможность открыть любой отчёт.
@@ -550,6 +624,7 @@ SCRIPT_META = {
 - Тема dark/light/system, масштаб UI 100/110/125 %.
 
 ### 10.1 Вкладка «Генерация»
+
 - Список скриптов (поиск по названию, группировка по `category`), кнопки «Обновить», «Добавить скрипт…»,
   «Открыть папку скриптов».
 - Панель выбранного скрипта: название, описание, версия, путь, бейдж `rules_hook`.
@@ -569,6 +644,7 @@ SCRIPT_META = {
 файл существует и открывается; авто-проверка показывает бейдж «OK / N замечаний».
 
 ### 10.2 Вкладка «Правила оформления»
+
 - Сверху: выбор пресета (combobox), кнопки «Сохранить», «Сохранить как…», «Сбросить к встроенному»,
   «Удалить» (только пользовательские), «Импорт JSON», «Экспорт JSON».
 - Переключатель **«Строгий режим (ГОСТ)»**. При включении значения полей приводятся к пресету
@@ -595,6 +671,7 @@ SCRIPT_META = {
 нормализация готового файла меняет поля/шрифт/интервалы и не ломает файл (открывается в Word/LibreOffice).
 
 ### 10.3 Вкладка «Проверка»
+
 - Режимы: «Один файл» / «Папка (пакетно)».
 - Выбор файла/папки: диалог + drag&drop (если легко реализуемо на Tk; иначе — только диалог,
   зафиксировать в `DECISIONS.md`).
@@ -614,6 +691,7 @@ SCRIPT_META = {
 (показывает статус «Ошибка чтения»).
 
 ### 10.4 Вкладка «Профиль» (отдельное редактирование метаданных)
+
 - Список профилей слева, кнопки «Новый», «Дублировать», «Переименовать», «Удалить»,
   «Импорт JSON», «Экспорт JSON».
 - Форма справа, секции:
@@ -630,6 +708,7 @@ SCRIPT_META = {
 «Генерация»; `extra`-ключи доступны скриптам; год по умолчанию = текущий.
 
 ### 10.5 Диалог «Настройки»
+
 Каталог скриптов, каталог вывода, режим интерпретатора (внутренний/внешний + путь),
 таймаут скрипта, тема, масштаб UI, portable-режим (вкл/выкл, с перезапуском),
 «Открыть каталог данных», «Сбросить настройки».
@@ -639,13 +718,15 @@ SCRIPT_META = {
 ## 11. Существующие скрипты: контракт и обязательные исправления
 
 ### 11.1 `mkdocx.py` — Markdown → DOCX
+
 CLI: `python3 -I scripts/mkdocx.py input.md output.docx '{"pz_no":"1","theme":"…","fio":"…","gruppa":"…","prep":"…"}'`
 
-Markdown: `#`…`####` заголовки, `-` списки, `| a | b |` таблицы, ``` блоки кода (Consolas 10),
-`![Подпись](img.jpg)` → рисунок + автоподпись `Рисунок N – Подпись`, `**жирный**`, `` `код` ``, `<https://…>`.
+Markdown: `#`…`####` заголовки, `-` списки, `| a | b |` таблицы, ```блоки кода (Consolas 10),
+`![Подпись](img.jpg)` → рисунок + автоподпись `Рисунок N – Подпись`, `**жирный**`,`` `код` ``, `<https://…>`.
 Шапка вуза — в константах `MINISTRY/FSBE/UNIV/KAF/DISC`.
 
 **Обязательные исправления в поставляемой копии:**
+
 1. `sect_body` содержит `pgNumType start="1"` → вторая физическая страница показывает «1» вместо «2».
    Исправить (одна секция + `titlePg`, либо `start="2"`).
 2. `sectPr` титула стоит **прямым потомком `body` в середине документа** — по схеме OOXML разрыв
@@ -668,9 +749,11 @@ Markdown: `#`…`####` заголовки, `-` списки, `| a | b |` таб�
     (`rules_hook: "native"` или `"constants"`), сохранив обратную совместимость CLI.
 
 ### 11.2 `check_docx.py` — проверка
+
 CLI: `python3 -I scripts/check_docx.py file.docx`
 
 **Дефекты, которые обязательно исправить:**
+
 1. Шрифт фактически не проверяется: всё не-Consolas计入 как TNR (Arial пройдёт как TNR).
 2. Допускает 12 pt и интервал 1,0 как «основные» — таблицы и код перебивают статистику и маскируют
    неверный основной текст. Считать основной текст **вне таблиц и код-блоков**.
@@ -684,6 +767,7 @@ CLI: `python3 -I scripts/check_docx.py file.docx`
 оставить для совместимости и запуска из терминала.
 
 ### 11.3 `make_karta.py`, `make_games.py`
+
 Самодостаточные генераторы с встроенным контентом (тех.карта занятия; подборка музыкальных игр).
 Добавить им `SCRIPT_META` (`input: "none"`, `rules_hook: "postprocess"`), вынести контент
 в параметры/внешний JSON, чтобы форму можно было заполнять из GUI. Для тех.карты — пресет
@@ -711,15 +795,15 @@ CLI: `python3 -I scripts/check_docx.py file.docx`
 
 ## 13. Задел на будущее (архитектурно предусмотреть, НЕ реализовывать в v1)
 
-| Функция v2 | Что заложить сейчас |
-|---|---|
-| Журнал запусков (SQLite) | `runner` возвращает структурированный результат-объект; лог-файлы уже пишутся |
-| Экспорт в PDF (LibreOffice headless) | отдельная функция-хук `export_pdf(path)` в `report.py`, вызов не подключать |
-| Редактор списка литературы | секция `references` в правилах уже есть; парсер записей вынести в отдельный модуль-заготовку |
-| WYSIWYG-конструктор титула | шапка титула описана данными профиля, а не хардкодом |
-| Шаблоны работ (реферат/курсовая/ВКР) | каталог `templates/` и поле `work_type` в профиле |
-| Английский интерфейс | все строки в `strings.py` |
-| Drag&drop файлов | абстракция «источник файла» в `dialogs.py` |
+| Функция v2                           | Что заложить сейчас                                                                          |
+| ------------------------------------ | -------------------------------------------------------------------------------------------- |
+| Журнал запусков (SQLite)             | `runner` возвращает структурированный результат-объект; лог-файлы уже пишутся                |
+| Экспорт в PDF (LibreOffice headless) | отдельная функция-хук `export_pdf(path)` в `report.py`, вызов не подключать                  |
+| Редактор списка литературы           | секция `references` в правилах уже есть; парсер записей вынести в отдельный модуль-заготовку |
+| WYSIWYG-конструктор титула           | шапка титула описана данными профиля, а не хардкодом                                         |
+| Шаблоны работ (реферат/курсовая/ВКР) | каталог `templates/` и поле `work_type` в профиле                                            |
+| Английский интерфейс                 | все строки в `strings.py`                                                                    |
+| Drag&drop файлов                     | абстракция «источник файла» в `dialogs.py`                                                   |
 
 **Явно вне скоупа v1:** журнал/БД, PDF, редактор библиографии, конструктор титула, антиплагиат,
 сеть/обновления, мультиязычность, установщик MSI.
@@ -729,24 +813,28 @@ CLI: `python3 -I scripts/check_docx.py file.docx`
 ## 14. Сборка и CI
 
 ### 14.1 `requirements.txt`
+
 ```text
 customtkinter>=5.2.2
 pillow>=10.0.0
 ```
 
 ### 14.2 `requirements-dev.txt`
+
 ```text
 -r requirements.txt
 pyinstaller>=6.0
 ```
 
 ### 14.3 `build.spec` (создай рабочий)
+
 - `--onefile`, `--windowed`, имя `GostGenerator`, иконка `assets/logo.ico`.
 - `datas`: `assets/`, `presets/`, `profiles/`, встроенные `scripts/` (распаковка при первом старте).
 - `hiddenimports`: `customtkinter`, `PIL._tkinter_finder`.
 - Явно включить Tcl/Tk и темы CustomTkinter (типовая проблема PyInstaller — не найденные `.json` тем).
 
 ### 14.4 `.github/workflows/build-windows.yml`
+
 Триггеры: push тега `v*`, `workflow_dispatch`. Шаги:
 `actions/checkout` → `actions/setup-python` (3.11) → `pip install -r requirements-dev.txt` →
 `python -m unittest discover -s tests` → `pyinstaller build.spec` →
@@ -755,6 +843,7 @@ pyinstaller>=6.0
 Дополнительный job на `ubuntu-latest`: только тесты (быстрая проверка кроссплатформенности).
 
 ### 14.5 `Makefile`
+
 Цели: `run`, `test`, `lint` (опционально `python -m compileall`), `build-win-local`,
 `appimage` (через `appimagetool`, опционально), `deb` (через `dpkg-deb`, опционально), `clean`.
 
@@ -763,6 +852,7 @@ pyinstaller>=6.0
 ## 15. Тесты и QA
 
 ### Автотесты (`unittest`, без сети и GUI)
+
 - `test_units.py` — все пересчёты мм/см/пт/twips/half-points, округления, обратные преобразования.
 - `test_config.py` — чтение/запись/валидация, битый JSON, миграция `schema_version`, дефолты.
 - `test_plugin_loader.py` — парсинг `SCRIPT_META` через `ast`, скрипт без меты, битый скрипт,
@@ -777,6 +867,7 @@ pyinstaller>=6.0
 без необходимости — если хранишь, зафиксируй в `DECISIONS.md`.
 
 ### Ручной QA-чек-лист (выполнить и приложить результат в `CHANGELOG.md`)
+
 1. Debian: `python -m app` запускается, все 4 вкладки открываются, тема переключается.
 2. Положил новый `.py` в `scripts/` → F5 → скрипт в списке → форма построена → генерация → `.docx` есть.
 3. Скрипт без меты → ручные аргументы → запуск успешен.
@@ -796,15 +887,15 @@ pyinstaller>=6.0
 
 ## 16. Порядок работы и критерии приёмки
 
-| Этап | Содержание | Критерий готовности |
-|---|---|---|
+| Этап   | Содержание                                                                                               | Критерий готовности                                                           |
+| ------ | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | **M1** | Каркас: окно, сайдбар, 4 вкладки-заготовки, лог-панель, `constants/units/config/strings`, дефолтные JSON | приложение запускается, вкладки переключаются, тесты `units`/`config` зелёные |
-| **M2** | `plugin_loader` + вкладка «Генерация» + `runner` (включая `--internal-run`) | S1 работает end-to-end в режиме разработки |
-| **M3** | `rules_store` + вкладка «Правила» (все секции, строгий режим, CRUD пресетов) | S2: правки сохраняются и влияют на генерацию |
-| **M4** | `docx_inspector` + `report` + вкладка «Проверка» (одиночная и пакетная) | S3 работает; тесты инспектора зелёные |
-| **M5** | `profile_store` + вкладка «Профиль» + подстановка `meta` | несколько профилей, `extra`, предпросмотр шапки |
-| **M6** | `docx_normalizer` + «Применить к готовому файлу» + исправления `mkdocx.py`/`check_docx.py` из §11 | нормализация идемпотентна, тесты зелёные, все 12 багов закрыты |
-| **M7** | `build.spec`, workflow, Makefile, README, DECISIONS, CHANGELOG | CI собирает exe; ручной QA-чек-лист пройден |
+| **M2** | `plugin_loader` + вкладка «Генерация» + `runner` (включая `--internal-run`)                              | S1 работает end-to-end в режиме разработки                                    |
+| **M3** | `rules_store` + вкладка «Правила» (все секции, строгий режим, CRUD пресетов)                             | S2: правки сохраняются и влияют на генерацию                                  |
+| **M4** | `docx_inspector` + `report` + вкладка «Проверка» (одиночная и пакетная)                                  | S3 работает; тесты инспектора зелёные                                         |
+| **M5** | `profile_store` + вкладка «Профиль» + подстановка `meta`                                                 | несколько профилей, `extra`, предпросмотр шапки                               |
+| **M6** | `docx_normalizer` + «Применить к готовому файлу» + исправления `mkdocx.py`/`check_docx.py` из §11        | нормализация идемпотентна, тесты зелёные, все 12 багов закрыты                |
+| **M7** | `build.spec`, workflow, Makefile, README, DECISIONS, CHANGELOG                                           | CI собирает exe; ручной QA-чек-лист пройден                                   |
 
 Работай последовательно M1→M7. После каждого этапа выдавай изменённые/новые файлы **целиком**.
 
@@ -844,11 +935,13 @@ pyinstaller>=6.0
 ## 19. CLI для ИИ-агентов (обязательно в v1)
 
 ### 19.1 Один источник истины
+
 GUI и CLI — оболочки над `app/core`. Дублирование логики запрещено: инспектор, нормализатор,
 раннер и хранилища правил одни и те же. `app/cli.py` **не импортирует** `app/ui` и `customtkinter`
 (проверяется тестом), работает headless.
 
 ### 19.2 Точка входа
+
 - Разработка: `python -m app.cli <command> ...`
 - Сборка: в `build.spec` **два EXE из одного кода**:
   `GostGenerator.exe` (`console=False`, GUI) и `gost.exe` (`console=True`, CLI).
@@ -856,6 +949,7 @@ GUI и CLI — оболочки над `app/core`. Дублирование ло
 - Опционально `console_scripts` в packaging: `gost = app.cli:main`.
 
 ### 19.3 Команды
+
 ```text
 gost init [--agents] [--dir PATH]
 gost doctor [--json]
@@ -876,19 +970,22 @@ gost context [--json]
 ```
 
 ### 19.4 Контракт вывода (критично)
+
 - **stdout — только результат** (JSON при `--json`, иначе текст/md). **stderr — логи и прогресс.**
   Смешивать запрещено.
 - Единый конверт JSON для всех команд:
+
 ```json
 {
   "schema_version": 1,
   "ok": false,
   "command": "check",
   "data": {},
-  "errors": [{"code": "FILE_NOT_FOUND", "message": "...", "path": "..."}],
+  "errors": [{ "code": "FILE_NOT_FOUND", "message": "...", "path": "..." }],
   "warnings": []
 }
 ```
+
 - `gost check` в `data`: `file`, `preset`, `strict`, `summary{error,warning,info}`,
   `issues[{code,severity,message,location{paragraph,snippet},hint}]`.
 - Никакого интерактива: ни `input()`, ни подтверждений. Флаг `--yes` подразумевается.
@@ -896,33 +993,37 @@ gost context [--json]
 - `fix` идемпотентен: повторный запуск не меняет файл (тест обязателен).
 
 ### 19.5 Коды возврата
-| Код | Значение |
-|---|---|
-| 0 | успех, нарушений нет |
-| 1 | найдены нарушения (`check`, `run --check`) |
-| 2 | ошибка аргументов/использования |
-| 3 | файл или каталог не найден |
-| 4 | скрипт-плагин завершился с ошибкой |
-| 5 | таймаут |
-| 6 | невалидный конфиг/пресет/профиль |
-| 7 | нормализация не удалась |
+
+| Код | Значение                                   |
+| --- | ------------------------------------------ |
+| 0   | успех, нарушений нет                       |
+| 1   | найдены нарушения (`check`, `run --check`) |
+| 2   | ошибка аргументов/использования            |
+| 3   | файл или каталог не найден                 |
+| 4   | скрипт-плагин завершился с ошибкой         |
+| 5   | таймаут                                    |
+| 6   | невалидный конфиг/пресет/профиль           |
+| 7   | нормализация не удалась                    |
 
 ### 19.6 Приоритет настроек
+
 `флаги > переменные окружения (GOST_RULES, GOST_PROFILE, GOST_HOME, GOST_OUTPUT) >
 gost.json в текущем проекте > пользовательский конфиг > встроенные дефолты`.
 
 ### 19.7 Декларативная задача
+
 ```json
 {
   "schema_version": 1,
   "script": "make_karta.py",
-  "params": {"theme": "Моя семья", "age_group": "3-4", "duration_min": 15},
+  "params": { "theme": "Моя семья", "age_group": "3-4", "duration_min": 15 },
   "rules": "pedagogical",
   "profile": "default",
   "output": "output/karta.docx",
-  "post": {"normalize": true, "check": true, "fail_on": "error"}
+  "post": { "normalize": true, "check": true, "fail_on": "error" }
 }
 ```
+
 `gost job run task.json --json` выполняет генерацию, нормализацию и проверку как одну операцию.
 
 ---
@@ -941,6 +1042,7 @@ gost.json в текущем проекте > пользовательский к
 5. **`examples/`** — по одному рабочему примеру на команду и один `task.json`.
 
 ### 20.1 Правки существующих разделов
+
 - §4: добавить `app/cli.py`, `app/core/job.py`, `schemas/`, `examples/`, `AGENTS.md`, `tests/test_cli.py`.
 - §12: добавить «CLI не импортирует GUI; работает без дисплея».
 - §14: два EXE в `build.spec`; CI-шаг smoke-теста CLI (`gost doctor`, `gost check` на фикстуре,
@@ -952,5 +1054,6 @@ gost.json в текущем проекте > пользовательский к
   без участия человека, читая только `AGENTS.md`».
 
 ### 20.2 Задел на будущее
+
 `gost mcp serve` (MCP-сервер поверх того же ядра) — в v1 не реализовывать,
 архитектура «ядро отдельно от оболочек» это позволяет без переписывания.
