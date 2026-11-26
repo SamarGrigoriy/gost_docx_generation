@@ -8,17 +8,18 @@ import customtkinter
 # Ядро подключается к CLI динамически (`importlib.import_module("app.core." + name)` в
 # app/cli_core.py), поэтому граф статических импортов PyInstaller его не видит и в onefile
 # архив кладёт только app.cli_core: `gost.exe check` падал с CORE_NOT_AVAILABLE.
+# Каталог проекта в sys.path добавляем сами: `pyinstaller build.spec` (в отличие от
+# `python -m PyInstaller`) запускает spec без него, и импорт падал с ModuleNotFoundError.
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(SPECPATH))
+
 from app.cli_core import CORE_MODULES  # noqa: E402
 
-datas = [
-    ("assets", "assets"),
-    ("presets", "presets"),
-    ("profiles", "profiles"),
-    ("scripts", "scripts"),
-    ("schemas", "schemas"),
-    ("examples", "examples"),
-    ("AGENTS.md", "."),
-]
+datas = [(os.path.join(SPECPATH, name), name) for name in
+         ("assets", "presets", "profiles", "scripts", "schemas", "examples")]
+datas.append((os.path.join(SPECPATH, "AGENTS.md"), "."))
 # Темы CustomTkinter — типовая проблема PyInstaller: .json темы лежат внутри пакета и
 # без явного сбора не попадают в onefile-архив.
 datas += collect_data_files("customtkinter")
@@ -30,7 +31,7 @@ hiddenimports = [
 ] + [f"app.core.{name}" for name in CORE_MODULES] + collect_submodules("customtkinter")
 
 common = dict(
-    pathex=["."],
+    pathex=[SPECPATH],
     hiddenimports=hiddenimports,
     hookspath=[],
     datas=datas,

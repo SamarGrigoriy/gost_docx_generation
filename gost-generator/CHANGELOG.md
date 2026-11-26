@@ -60,6 +60,9 @@
   добирает `app.core.*` в `hiddenimports` из `CORE_MODULES`, потому что ядро подключается
   динамическим `importlib.import_module` и остаётся вне графа статических импортов PyInstaller
   (DECISIONS D46). Поймал smoke-шаг `build-windows.yml`, а не юнит-тесты.
+- Тот же прогон показал, что spec зависел от способа запуска: `pyinstaller build.spec` (так в CI)
+  не добавляет каталог проекта в `sys.path`, в отличие от `python -m PyInstaller`, и сборка падала
+  с `ModuleNotFoundError: No module named 'app'`. Пути в spec строятся от `SPECPATH` (D47).
 - UTF-8 для stdout/stderr во всех точках входа и `PYTHONIOENCODING=utf-8` дочерним плагинам:
   на Windows-консоли (cp866/cp1251) кириллица в имени документа роняла CLI и генератор фикстур
   с `UnicodeEncodeError` — это поймал первый же CI-прогон на `windows-latest`.

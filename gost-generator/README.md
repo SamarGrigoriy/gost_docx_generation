@@ -40,11 +40,11 @@ exe собирается **только под Windows** (ограничение
 
 Сам `build.spec` можно проверить под своей ОС, не собирая exe: PyInstaller строит архив по
 статическому графу импортов, а ядро подключается динамически, поэтому модули `app.core.*`
-обязаны быть в `hiddenimports` (берутся из `cli_core.CORE_MODULES`). Проверка на Linux:
+обязаны быть в `hiddenimports` (берутся из `cli_core.CORE_MODULES`). Запускать надо ровно той же
+командой, что и CI (`pyinstaller`, а не `python -m PyInstaller` — у них разный `sys.path`):
 
 ```bash
-venv/bin/python -m PyInstaller build.spec --noconfirm \
-    --distpath dist_local --workpath build_local
+venv/bin/pyinstaller build.spec --noconfirm --distpath dist_local --workpath build_local
 ./dist_local/gost doctor --json | grep -A1 core.docx_inspector   # должен быть "ok"
 ./dist_local/gost check tests/fixtures/fixtures_good.docx --format json --fail-on error
 ```
