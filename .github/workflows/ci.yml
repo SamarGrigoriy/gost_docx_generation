@@ -48,6 +48,6 @@ jobs:
       - name: Generate fixtures
         run: python tests/fixtures/make_fixtures.py
         working-directory: gost-generator
-      - name: Run unit tests (GUI-тесты работают: Tk есть в сборке Python)
+      - name: Run unit tests (GUI-тесты работают, Tk есть в сборке Python)
         run: python -m unittest discover -s tests -v
         working-directory: gost-generator
