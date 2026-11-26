@@ -136,7 +136,7 @@
 | 9 | Пакетная проверка папки из 5 файлов, один битый | Пройден — 5 строк сводки, у битого статус «Ошибка чтения», падения нет |
 | 10 | Два профиля, переключение, `extra`, год | Пройден — `qa_key=qa_value` дошёл до скрипта, пустой год подставлен как 2026, активный профиль переключается |
 | 11 | Пути с пробелами и кириллицей | Пройден — `…/Мои работы/отчёт 1.docx` создан и валиден |
-| 12 | Windows exe из CI без установленного Python | Не проверялся локально — PyInstaller собирает `.exe` только под Windows; проверка закреплена шагом `CLI smoke test` в `.github/workflows/build-windows.yml` (DECISIONS D36) |
+| 12 | Windows exe из CI без установленного Python | Пройден в CI (run 45771834485): `pyinstaller` собирает `gost.exe` и `GostGenerator.exe`, CLI-smoke без Python печатает валидный конверт и `check` на эталонной фикстуре даёт код 0, GUI-smoke держит окно 20 с; артефакт `GostGenerator-windows.zip` 38 МБ. Локально пункт непроверяем (PyInstaller собирает .exe только под Windows, D36); по пути прогон нашёл и исправил два дефекта сборки — D46, D47 |
 
 ### Проверки CLI (живым запуском)
 
@@ -154,7 +154,9 @@
 ## Автотесты
 
 `python -m unittest discover -s tests` — 170 тестов, все зелёные (прогон 2026-11-26, Debian 14,
-Python 3.14, ~26 с). Модули: units, config, plugin_loader, runner,
+Python 3.14, ~26 с). Тот же набор прогоняет CI на Linux (3.11/3.13/3.14) и Windows (3.11/3.13),
+где GUI-тесты не пропускаются, а выполняются: Tk есть в сборке Python на раннере. Модули: units,
+config, plugin_loader, runner,
 inspector, normalizer, rules_store, profile_store, report, cli (коды возврата, dry-run,
 приоритеты настроек), ui-smoke (реальное окно, пропускается без дисплея).
 
