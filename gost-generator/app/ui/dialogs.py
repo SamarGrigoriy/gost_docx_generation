@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import os
 import platform
+import shutil
 import subprocess
 import sys
 import tkinter as tk
@@ -35,6 +36,8 @@ FILETYPES_PY = ((t("filetypes_py"), "*.py"),)
 FILETYPES_JSON = ((t("filetypes_json"), "*.json"),)
 FILETYPES_ALL = ((t("filetypes_all"), "*.*"),)
 FILETYPES_DOCX_ALL = FILETYPES_DOCX + FILETYPES_ALL
+# Сколько ждать ответа системного просмотрщика: дольше — значит окно уже открывается.
+OPEN_VERIFY_TIMEOUT_S = 1.5
 
 
 # ---------------------------------------------------------------------------
@@ -443,7 +446,13 @@ def settings_dialog(master: ctk.CTk, state: dict, dirs: Any,
 # Открытие файла/папки системным просмотрщиком (без shell=True, п. 12)
 # ---------------------------------------------------------------------------
 def open_path(path: str | os.PathLike[str]) -> str | None:
-    """Открыть файл/каталог родным способом ОС. Возвращает текст ошибки или None."""
+    """Открыть файл/каталог родным способом ОС. Возвращает текст ошибки или None.
+
+    Запуск проверяется: `Popen` без кода возврата означает только «процесс стартовал»,
+    а пользователь при этом видит ничего — просмотрщик мог отказать (нет ассоциации,
+    права, DISPLAY). Поэтому ждём завершения с коротким лимитом: молча долгий процесс —
+    успех, быстрый ненулевой код — ошибка с текстом из stderr.
+    """
     target = str(path)
     if not os.path.exists(target):
         return t("open_missing", path=target)
@@ -451,11 +460,26 @@ def open_path(path: str | os.PathLike[str]) -> str | None:
         system = platform.system()
         if system == "Windows":
             os.startfile(target)  # type: ignore[attr-defined]  # есть только на Windows
-        elif system == "Darwin":
-            subprocess.Popen(["open", target])
-        else:
-            subprocess.Popen(["xdg-open", target])
-        return None
+            return None
+        cmd = "open" if system == "Darwin" else "xdg-open"
+        binary = shutil.which(cmd)
+        if binary is None:
+            return t("open_no_handler", cmd=cmd)
+        proc = subprocess.Popen([binary, target], stdin=subprocess.DEVNULL,
+                                stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+                                text=True, encoding="utf-8", errors="replace")
+        try:
+            rc = proc.wait(timeout=OPEN_VERIFY_TIMEOUT_S)
+        except subprocess.TimeoutExpired:
+            return None
+        if rc == 0:
+            return None
+        why = ""
+        try:
+            why = (proc.stderr.read() if proc.stderr else "").strip()
+        except Exception:
+            why = ""
+        return t("open_failed", code=rc, why=why or t("open_failed_plain"))
     except Exception as exc:  # нет ассоциаций/прав — понятное сообщение, не падение
         return str(exc)
 

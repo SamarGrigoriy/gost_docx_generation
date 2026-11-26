@@ -395,5 +395,5 @@ class CheckerTab(ctk.CTkFrame):
         if not path:
             return
         err = dialogs.open_path(path)
-        if err:
-            self.app.log.log_sys(t("open_error", path=path, why=err))
+        self.app.log.log_sys(t("open_error", path=path, why=err) if err
+                             else t("open_done", path=path))

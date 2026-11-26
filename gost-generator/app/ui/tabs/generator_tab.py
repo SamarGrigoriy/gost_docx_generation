@@ -457,14 +457,17 @@ class GeneratorTab(GeneratorRunMixin, ctk.CTkFrame):
         self.result_badge.set_text(text, kind)
 
     def open_scripts_dir(self) -> None:
-        err = dialogs.open_path(self.app.scripts_dir())
-        if err:
-            self.log(t("open_error", path=self.app.scripts_dir(), why=err))
+        self._open_dir(self.app.scripts_dir())
 
     def open_output_dir(self) -> None:
-        err = dialogs.open_path(self.app.output_dir())
-        if err:
-            self.log(t("open_error", path=self.app.output_dir(), why=err))
+        self._open_dir(self.app.output_dir())
+
+    def _open_dir(self, path: str) -> None:
+        """Отклик в журнале обязателен в обоих исходах: без него клик выглядит «мёртвым»,
+        когда файловый менеджер переиспользует своё окно вместо нового."""
+        err = dialogs.open_path(path)
+        self.log(t("open_error", path=path, why=err) if err
+                 else t("open_done", path=path))
 
     # ------------------------------------------------------------------
     # Валидация до запуска (инлайн, п. 10.1)

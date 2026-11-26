@@ -33,6 +33,17 @@ def _pump(win, rounds: int = 20) -> None:
         win.update()
 
 
+def _drain(win, seconds: float = 1.5) -> None:
+    """То же во времени: строки журнала приходят через after-очередь с шагом 60 мс,
+    без пауз между update() они не успевают вставиться в текстбокс."""
+    import time
+
+    end = time.time() + seconds
+    while time.time() < end:
+        win.update()
+        time.sleep(0.02)
+
+
 class UiSmokeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -144,6 +155,56 @@ class UiSmokeTests(unittest.TestCase):
 
             shutil.rmtree(src_dir, ignore_errors=True)
         tab.refresh_scripts(notify=False)
+
+    def test_open_scripts_dir_reports_outcome_in_journal(self) -> None:
+        """Кнопка «Открыть папку скриптов» отчитывается в журнале в обоих исходах.
+
+        Без строки в журнале клик выглядит мёртвым: просмотрщик мог переиспользовать своё
+        окно (нового не появляется) или отказаться открывать каталог — пользователю нечего
+        читать на экране. Подменяем `xdg-open` на скрипт с нужным кодом возврата.
+        """
+        import os
+        import shutil
+        import sys
+        import tempfile
+
+        from app.strings import t
+        from app.ui import dialogs
+
+        if not sys.platform.startswith("linux"):
+            self.skipTest("механизм xdg-open проверяется на Linux")
+        tab = self.win.tabs["generator"]
+        scripts = str(self.win.scripts_dir())
+        old_path = os.environ["PATH"]
+        dirs: list[str] = []
+
+        def fake_handler(rc: int, note: str) -> str:
+            d = tempfile.mkdtemp()
+            dirs.append(d)
+            script = os.path.join(d, "xdg-open")
+            with open(script, "w", encoding="utf-8") as fh:
+                fh.write(f"#!/bin/sh\nprintf '%s' '{note}' >&2\nexit {rc}\n")
+            os.chmod(script, 0o755)
+            return d
+
+        try:
+            os.environ["PATH"] = fake_handler(1, "нет метода") + os.pathsep + old_path
+            self.win.log.clear()
+            tab.open_scripts_dir()
+            _drain(self.win)
+            text = self.win.log.get_text()
+            self.assertIn(t("open_error", path=scripts,
+                            why=t("open_failed", code=1, why="нет метода")), text)
+
+            os.environ["PATH"] = fake_handler(0, "") + os.pathsep + old_path
+            self.win.log.clear()
+            tab.open_scripts_dir()
+            _drain(self.win)
+            self.assertIn(t("open_done", path=scripts), self.win.log.get_text())
+        finally:
+            os.environ["PATH"] = old_path
+            for d in dirs:
+                shutil.rmtree(d, ignore_errors=True)
 
 
 if __name__ == "__main__":
